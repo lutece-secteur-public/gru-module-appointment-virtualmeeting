@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+	<properties>
+		<title>Module Appointment Virtual Meeting</title>
+	</properties>
+	<body>
+		<section name="Module Appointment Virtual Meeting">
+			<subsection name="Introduction">
+				<p>
+					Ce module ajoute la gestion de salles de visioconf&#233;rence au syst&#232;me
+					de rendez-vous Lutece. Il s'int&#232;gre au moteur de workflow pour cr&#233;er
+					et supprimer automatiquement des salles de visioconf&#233;rence lors des
+					changements d'&#233;tat des rendez-vous.
+				</p>
+				<p>
+					Le module est ind&#233;pendant du fournisseur : il d&#233;finit l'interface
+					<code>IVirtualMeetingProvider</code> et d&#233;l&#232;gue toutes les op&#233;rations
+					sp&#233;cifiques au serveur (cr&#233;ation de salle, g&#233;n&#233;ration de jeton,
+					construction d'URL) aux librairies fournisseur telles que <code>library-livekit</code>
+					ou <code>library-meet</code>.
+				</p>
+				<p>
+					Il fournit les t&#226;ches de workflow suivantes :
+				</p>
+				<ul>
+					<li>
+						<b>Ajouter une visioconf&#233;rence</b> &#8212; Cr&#233;e une salle de r&#233;union
+						via le fournisseur configur&#233; et &#233;crit les URL de r&#233;union
+						participant/agent dans les r&#233;ponses du formulaire de rendez-vous.
+					</li>
+					<!--
+					<li>
+						<b>Supprimer une visioconf&#233;rence</b> - Supprime la salle de r&#233;union associ&#233;e &#224; un rendez-vous.
+					</li>
+					-->
+				</ul>
+			</subsection>
+			<subsection name="Configuration">
+				<p>
+					Configurez le module dans le fichier
+					<code>WEB-INF/conf/plugins/appointment-virtualmeeting.properties</code> :
+				</p>
+				<table>
+					<tr>
+						<th>Propri&#233;t&#233;</th>
+						<th>Description</th>
+						<th>Valeur par d&#233;faut</th>
+					</tr>
+					<tr>
+						<td><code>virtualmeeting.room.emptyTimeout</code></td>
+						<td>
+							Nombre de secondes pendant lesquelles la salle reste active apr&#232;s
+							le d&#233;part du dernier participant. La valeur <code>0</code> utilise
+							la valeur par d&#233;faut du fournisseur.
+						</td>
+						<td><code>0</code></td>
+					</tr>
+				</table>
+				<p>
+					La t&#226;che <b>Ajouter une visioconf&#233;rence</b> se configure directement
+					dans le back office du workflow. Le formulaire de configuration permet de :
+				</p>
+				<ul>
+					<li>S&#233;lectionner le fournisseur de visioconf&#233;rence (ex. <code>livekit</code>, <code>meet</code>)</li>
+					<li>Choisir le champ du formulaire de rendez-vous o&#249; l'<b>URL de r&#233;union usager</b> sera &#233;crite</li>
+					<li>Choisir le champ du formulaire de rendez-vous o&#249; l'<b>URL de r&#233;union agent</b> sera &#233;crite</li>
+				</ul>
+			</subsection>
+			<subsection name="Utilisation">
+				<p>
+					Ajoutez la d&#233;pendance Maven dans le POM de votre site :
+				</p>
+				<source>
+&lt;dependency&gt;
+    &lt;groupId&gt;fr.paris.lutece.plugins&lt;/groupId&gt;
+    &lt;artifactId&gt;module-appointment-virtualmeeting&lt;/artifactId&gt;
+    &lt;version&gt;1.0.0-SNAPSHOT&lt;/version&gt;
+    &lt;type&gt;lutece-plugin&lt;/type&gt;
+&lt;/dependency&gt;
+				</source>
+				<p>
+					Vous devez &#233;galement inclure au moins une librairie fournisseur :
+				</p>
+				<source>
+&lt;!-- Fournisseur LiveKit --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;fr.paris.lutece.plugins&lt;/groupId&gt;
+    &lt;artifactId&gt;library-livekit&lt;/artifactId&gt;
+    &lt;version&gt;1.0.0-SNAPSHOT&lt;/version&gt;
+    &lt;type&gt;lutece-plugin&lt;/type&gt;
+&lt;/dependency&gt;
+
+&lt;!-- OU Fournisseur Meet --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;fr.paris.lutece.plugins&lt;/groupId&gt;
+    &lt;artifactId&gt;library-meet&lt;/artifactId&gt;
+    &lt;version&gt;1.0.0-SNAPSHOT&lt;/version&gt;
+    &lt;type&gt;lutece-plugin&lt;/type&gt;
+&lt;/dependency&gt;
+				</source>
+				<p>
+					Une fois install&#233;es, les t&#226;ches de workflow apparaissent dans
+					l'interface de configuration du workflow. Pour mettre en place un workflow
+					de visioconf&#233;rence :
+				</p>
+				<ol>
+					<li>Cr&#233;ez deux champs texte dans votre formulaire de rendez-vous (ex. &#171; Lien de r&#233;union usager &#187; et &#171; Lien de r&#233;union agent &#187;)</li>
+					<li>Dans le workflow, ajoutez la t&#226;che <b>Ajouter une visioconf&#233;rence</b> &#224; l'action qui confirme le rendez-vous</li>
+					<li>Configurez la t&#226;che : s&#233;lectionnez le fournisseur et associez les deux champs du formulaire</li>
+					<li>Lorsque l'action est d&#233;clench&#233;e, la salle est cr&#233;&#233;e et les URL de r&#233;union sont &#233;crites dans les champs du formulaire</li>
+				</ol>
+				<p>
+					L'URL de r&#233;union agent est &#233;galement stock&#233;e dans l'historique
+					de la t&#226;che de workflow et peut &#234;tre consult&#233;e dans le back office
+					des rendez-vous.
+				</p>
+			</subsection>
+		</section>
+	</body>
+</document>

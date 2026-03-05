@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+	<properties>
+		<title>Module Appointment Virtual Meeting</title>
+	</properties>
+	<body>
+		<section name="Module Appointment Virtual Meeting">
+			<subsection name="Introduction">
+				<p>
+					This module adds virtual meeting room management to the Lutece appointment system.
+					It integrates with the workflow engine to automatically create and delete
+					video-conferencing rooms when appointment states change.
+				</p>
+				<p>
+					The module is provider-agnostic: it defines the <code>IVirtualMeetingProvider</code>
+					interface and delegates all server-specific operations (room creation, token generation,
+					URL building) to provider libraries such as <code>library-livekit</code> or
+					<code>library-meet</code>.
+				</p>
+				<p>
+					It provides the following workflow tasks:
+				</p>
+				<ul>
+					<li>
+						<b>Add Virtual Meeting</b> &#8212; Creates a meeting room via the configured provider
+						and writes the participant/agent meeting URLs into the appointment form responses.
+					</li>
+					<!--
+					<li>
+						<b>Delete Virtual Meeting</b> - Deletes the meeting room associated with an appointment.
+					</li>
+					-->
+				</ul>
+			</subsection>
+			<subsection name="Configuration">
+				<p>
+					Configure the module in the file
+					<code>WEB-INF/conf/plugins/appointment-virtualmeeting.properties</code>:
+				</p>
+				<table>
+					<tr>
+						<th>Property</th>
+						<th>Description</th>
+						<th>Default</th>
+					</tr>
+					<tr>
+						<td><code>virtualmeeting.room.emptyTimeout</code></td>
+						<td>
+							Number of seconds to keep the room alive after the last participant leaves.
+							Set to <code>0</code> to use the provider default.
+						</td>
+						<td><code>0</code></td>
+					</tr>
+				</table>
+				<p>
+					The <b>Add Virtual Meeting</b> task is configured directly in the workflow back office.
+					The configuration form allows you to:
+				</p>
+				<ul>
+					<li>Select the video-conferencing provider (e.g. <code>livekit</code>, <code>meet</code>)</li>
+					<li>Choose the appointment form field where the <b>user meeting URL</b> will be written</li>
+					<li>Choose the appointment form field where the <b>agent meeting URL</b> will be written</li>
+				</ul>
+			</subsection>
+			<subsection name="Usage">
+				<p>
+					Add the Maven dependency to your site POM:
+				</p>
+				<source>
+&lt;dependency&gt;
+    &lt;groupId&gt;fr.paris.lutece.plugins&lt;/groupId&gt;
+    &lt;artifactId&gt;module-appointment-virtualmeeting&lt;/artifactId&gt;
+    &lt;version&gt;1.0.0-SNAPSHOT&lt;/version&gt;
+    &lt;type&gt;lutece-plugin&lt;/type&gt;
+&lt;/dependency&gt;
+				</source>
+				<p>
+					You must also include at least one provider library:
+				</p>
+				<source>
+&lt;!-- LiveKit provider --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;fr.paris.lutece.plugins&lt;/groupId&gt;
+    &lt;artifactId&gt;library-livekit&lt;/artifactId&gt;
+    &lt;version&gt;1.0.0-SNAPSHOT&lt;/version&gt;
+    &lt;type&gt;lutece-plugin&lt;/type&gt;
+&lt;/dependency&gt;
+
+&lt;!-- OR Meet provider --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;fr.paris.lutece.plugins&lt;/groupId&gt;
+    &lt;artifactId&gt;library-meet&lt;/artifactId&gt;
+    &lt;version&gt;1.0.0-SNAPSHOT&lt;/version&gt;
+    &lt;type&gt;lutece-plugin&lt;/type&gt;
+&lt;/dependency&gt;
+				</source>
+				<p>
+					Once installed, the workflow tasks appear in the workflow configuration interface.
+					To set up a virtual meeting workflow:
+				</p>
+				<ol>
+					<li>Create two text fields in your appointment form (e.g. "User meeting link" and "Agent meeting link")</li>
+					<li>In the workflow, add the <b>Add Virtual Meeting</b> task to the action that confirms the appointment</li>
+					<li>Configure the task: select the provider and map the two form fields</li>
+					<li>When the action is triggered, the room is created and the meeting URLs are written into the form fields</li>
+				</ol>
+				<p>
+					The agent meeting URL is also stored in the workflow task history and can be viewed
+					in the appointment back office.
+				</p>
+			</subsection>
+		</section>
+	</body>
+</document>

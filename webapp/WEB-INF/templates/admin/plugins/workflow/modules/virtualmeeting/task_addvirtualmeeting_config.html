@@ -1,0 +1,29 @@
+<div class="form-group">
+    <label for="provider">#i18n{module.appointment.virtualmeeting.task.config.labelProvider}</label>
+    <select name="provider" id="provider" class="form-control">
+        <#list provider_list as item>
+            <option value="${item.code}" <#if config.provider?? && config.provider == item.code>selected</#if>>${item.name}</option>
+        </#list>
+    </select>
+    <small class="form-text text-muted">#i18n{module.appointment.virtualmeeting.task.config.labelProvider.help}</small>
+</div>
+
+<div class="form-group">
+    <label for="idEntryUserLink">#i18n{module.appointment.virtualmeeting.task.config.labelEntryUserLink}</label>
+    <select name="idEntryUserLink" id="idEntryUserLink" class="form-control">
+        <#list entry_list as item>
+            <option value="${item.code}" <#if config.idEntryUserLink?? && config.idEntryUserLink == item.code?number>selected</#if>>${item.name}</option>
+        </#list>
+    </select>
+    <small class="form-text text-muted">#i18n{module.appointment.virtualmeeting.task.config.labelEntryUserLink.help}</small>
+</div>
+
+<div class="form-group">
+    <label for="idEntryAgentLink">#i18n{module.appointment.virtualmeeting.task.config.labelEntryAgentLink}</label>
+    <select name="idEntryAgentLink" id="idEntryAgentLink" class="form-control">
+        <#list entry_list as item>
+            <option value="${item.code}" <#if config.idEntryAgentLink?? && config.idEntryAgentLink == item.code?number>selected</#if>>${item.name}</option>
+        </#list>
+    </select>
+    <small class="form-text text-muted">#i18n{module.appointment.virtualmeeting.task.config.labelEntryAgentLink.help}</small>
+</div>
