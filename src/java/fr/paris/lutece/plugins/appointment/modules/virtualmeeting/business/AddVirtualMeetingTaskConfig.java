@@ -42,8 +42,8 @@ public class AddVirtualMeetingTaskConfig extends TaskConfig
 {
     // Variables declaration
     private String _strProvider;
-    private int _nIdEntryUserLink;
-    private int _nIdEntryAgentLink;
+    private int _nIdEntryGuestLink;
+    private int _nIdEntryHostLink;
 
     /**
      * Returns the Provider
@@ -67,44 +67,44 @@ public class AddVirtualMeetingTaskConfig extends TaskConfig
     }
 
     /**
-     * Returns the IdEntryUserLink
-     * 
-     * @return The IdEntryUserLink
+     * Returns the IdEntryGuestLink
+     *
+     * @return The IdEntryGuestLink
      */
-    public int getIdEntryUserLink( )
+    public int getIdEntryGuestLink( )
     {
-        return _nIdEntryUserLink;
+        return _nIdEntryGuestLink;
     }
 
     /**
-     * Sets the IdEntryUserLink
-     * 
-     * @param nIdEntryUserLink
-     *            The IdEntryUserLink
+     * Sets the IdEntryGuestLink
+     *
+     * @param nIdEntryGuestLink
+     *            The IdEntryGuestLink
      */
-    public void setIdEntryUserLink( int nIdEntryUserLink )
+    public void setIdEntryGuestLink( int nIdEntryGuestLink )
     {
-        _nIdEntryUserLink = nIdEntryUserLink;
+        _nIdEntryGuestLink = nIdEntryGuestLink;
     }
 
     /**
-     * Returns the IdEntryAgentLink
-     * 
-     * @return The IdEntryAgentLink
+     * Returns the IdEntryHostLink
+     *
+     * @return The IdEntryHostLink
      */
-    public int getIdEntryAgentLink( )
+    public int getIdEntryHostLink( )
     {
-        return _nIdEntryAgentLink;
+        return _nIdEntryHostLink;
     }
 
     /**
-     * Sets the IdEntryAgentLink
-     * 
-     * @param nIdEntryAgentLink
-     *            The IdEntryAgentLink
+     * Sets the IdEntryHostLink
+     *
+     * @param nIdEntryHostLink
+     *            The IdEntryHostLink
      */
-    public void setIdEntryAgentLink( int nIdEntryAgentLink )
+    public void setIdEntryHostLink( int nIdEntryHostLink )
     {
-        _nIdEntryAgentLink = nIdEntryAgentLink;
+        _nIdEntryHostLink = nIdEntryHostLink;
     }
 }

@@ -34,13 +34,13 @@
 package fr.paris.lutece.plugins.appointment.modules.virtualmeeting.business;
 
 /**
- * Business class for task information stored alongside workflow history entries. Holds the agent meeting URL generated when a virtual meeting is created.
+ * Business class for task information stored alongside workflow history entries. Holds the host meeting URL generated when a virtual meeting is created.
  */
 public class VirtualMeetingTaskInformation
 {
     private int _nIdHistory;
     private int _nIdTask;
-    private String _strAgentUrl;
+    private String _strHostUrl;
     private String _strErrorMessage;
 
     /**
@@ -57,14 +57,14 @@ public class VirtualMeetingTaskInformation
      *            the workflow history id
      * @param nIdTask
      *            the task id
-     * @param strAgentUrl
-     *            the agent meeting URL
+     * @param strHostUrl
+     *            the host meeting URL
      */
-    public VirtualMeetingTaskInformation( int nIdHistory, int nIdTask, String strAgentUrl )
+    public VirtualMeetingTaskInformation( int nIdHistory, int nIdTask, String strHostUrl )
     {
         _nIdHistory = nIdHistory;
         _nIdTask = nIdTask;
-        _strAgentUrl = strAgentUrl;
+        _strHostUrl = strHostUrl;
     }
 
     public int getIdHistory( )
@@ -87,14 +87,14 @@ public class VirtualMeetingTaskInformation
         _nIdTask = nIdTask;
     }
 
-    public String getAgentUrl( )
+    public String getHostUrl( )
     {
-        return _strAgentUrl;
+        return _strHostUrl;
     }
 
-    public void setAgentUrl( String strAgentUrl )
+    public void setHostUrl( String strHostUrl )
     {
-        _strAgentUrl = strAgentUrl;
+        _strHostUrl = strHostUrl;
     }
 
     public String getErrorMessage( )

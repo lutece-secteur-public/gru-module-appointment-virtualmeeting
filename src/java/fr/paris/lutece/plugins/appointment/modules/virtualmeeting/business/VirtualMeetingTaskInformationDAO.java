@@ -40,8 +40,8 @@ import fr.paris.lutece.util.sql.DAOUtil;
  */
 public class VirtualMeetingTaskInformationDAO
 {
-    private static final String SQL_QUERY_INSERT = "INSERT INTO workflow_task_virtualmeeting_information ( id_history, id_task, agent_url, error_message ) VALUES ( ?, ?, ?, ? )";
-    private static final String SQL_QUERY_SELECT = "SELECT id_history, id_task, agent_url, error_message FROM workflow_task_virtualmeeting_information WHERE id_history = ? AND id_task = ?";
+    private static final String SQL_QUERY_INSERT = "INSERT INTO workflow_task_virtualmeeting_information ( id_history, id_task, host_url, error_message ) VALUES ( ?, ?, ?, ? )";
+    private static final String SQL_QUERY_SELECT = "SELECT id_history, id_task, host_url, error_message FROM workflow_task_virtualmeeting_information WHERE id_history = ? AND id_task = ?";
     private static final String SQL_QUERY_DELETE = "DELETE FROM workflow_task_virtualmeeting_information WHERE id_history = ? AND id_task = ?";
 
     public void insert( VirtualMeetingTaskInformation information )
@@ -51,7 +51,7 @@ public class VirtualMeetingTaskInformationDAO
             int nIndex = 1;
             daoUtil.setInt( nIndex++, information.getIdHistory( ) );
             daoUtil.setInt( nIndex++, information.getIdTask( ) );
-            daoUtil.setString( nIndex++, information.getAgentUrl( ) );
+            daoUtil.setString( nIndex++, information.getHostUrl( ) );
             daoUtil.setString( nIndex, information.getErrorMessage( ) != null ? information.getErrorMessage( ) : "" );
             daoUtil.executeUpdate( );
         }
@@ -71,7 +71,7 @@ public class VirtualMeetingTaskInformationDAO
                 int nIndex = 1;
                 information.setIdHistory( daoUtil.getInt( nIndex++ ) );
                 information.setIdTask( daoUtil.getInt( nIndex++ ) );
-                information.setAgentUrl( daoUtil.getString( nIndex++ ) );
+                information.setHostUrl( daoUtil.getString( nIndex++ ) );
                 information.setErrorMessage( daoUtil.getString( nIndex ) );
 
                 return information;

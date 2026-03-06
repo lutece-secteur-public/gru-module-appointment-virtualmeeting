@@ -56,15 +56,17 @@ public class VirtualMeetingService
     private static final String ROOM_NAME_PREFIX = "vm-";
 
     /**
-     * Create a virtual meeting room for the given appointment.
+     * Create a virtual meeting room for the given resource.
      *
-     * @param nIdAppointment
-     *            the appointment ID
+     * @param strIdResource
+     *            the resource ID
+     * @param strResourceType
+     *            the resource type
      * @param strProviderName
      *            the provider name (see {@link IVirtualMeetingProvider#getName()}); if {@code null} or empty, the default provider is used
      * @return the created {@link VirtualMeeting}, or {@code null} on failure
      */
-    public VirtualMeeting createMeeting( int nIdAppointment, String strProviderName )
+    public VirtualMeeting createMeeting( String strIdResource, String strResourceType, String strProviderName )
     {
         IVirtualMeetingProvider provider = getProvider( strProviderName );
 
@@ -74,7 +76,7 @@ public class VirtualMeetingService
             return null;
         }
 
-        String strRoomName = ROOM_NAME_PREFIX + nIdAppointment;
+        String strRoomName = ROOM_NAME_PREFIX + strResourceType + "-" + strIdResource;
         int nEmptyTimeout = AppPropertiesService.getPropertyInt( PROPERTY_EMPTY_TIMEOUT, DEFAULT_EMPTY_TIMEOUT );
 
         boolean bCreated = provider.createRoom( strRoomName, nEmptyTimeout, 0 );
@@ -86,7 +88,8 @@ public class VirtualMeetingService
         }
 
         VirtualMeeting meeting = new VirtualMeeting( );
-        meeting.setIdAppointment( nIdAppointment );
+        meeting.setIdResource( strIdResource );
+        meeting.setResourceType( strResourceType );
         meeting.setRoomName( strRoomName );
         meeting.setProvider( provider.getName( ) );
         meeting.setCreationDate( new Timestamp( System.currentTimeMillis( ) ) );
@@ -95,19 +98,21 @@ public class VirtualMeetingService
     }
 
     /**
-     * Delete the virtual meeting room associated with the given appointment.
+     * Delete the virtual meeting room associated with the given resource.
      *
-     * @param nIdAppointment
-     *            the appointment ID
+     * @param strIdResource
+     *            the resource ID
+     * @param strResourceType
+     *            the resource type
      * @return {@code true} if the room was deleted successfully
      */
-    public boolean deleteMeeting( int nIdAppointment )
+    public boolean deleteMeeting( String strIdResource, String strResourceType )
     {
-        VirtualMeeting meeting = VirtualMeetingHome.findByAppointmentId( nIdAppointment );
+        VirtualMeeting meeting = VirtualMeetingHome.findByResourceId( strIdResource, strResourceType );
 
         if ( meeting == null )
         {
-            AppLogService.info( "VirtualMeeting — no meeting found for appointment {}", nIdAppointment );
+            AppLogService.info( "VirtualMeeting — no meeting found for resource {}/{}", strIdResource, strResourceType );
             return false;
         }
 
@@ -122,36 +127,38 @@ public class VirtualMeetingService
             AppLogService.error( "VirtualMeeting — no provider found for name: '{}'. Removing DB record only.", meeting.getProvider( ) );
         }
 
-        VirtualMeetingHome.removeByAppointmentId( nIdAppointment );
+        VirtualMeetingHome.removeByResourceId( strIdResource, strResourceType );
         return true;
     }
 
     /**
-     * Find the virtual meeting associated with the given appointment.
+     * Find the virtual meeting associated with the given resource.
      *
-     * @param nIdAppointment
-     *            the appointment ID
+     * @param strIdResource
+     *            the resource ID
+     * @param strResourceType
+     *            the resource type
      * @return the {@link VirtualMeeting}, or {@code null} if none exists
      */
-    public VirtualMeeting findByAppointmentId( int nIdAppointment )
+    public VirtualMeeting findByResourceId( String strIdResource, String strResourceType )
     {
-        return VirtualMeetingHome.findByAppointmentId( nIdAppointment );
+        return VirtualMeetingHome.findByResourceId( strIdResource, strResourceType );
     }
 
     /**
-     * Generate a meeting URL for an agent (admin) with full participant permissions.
+     * Generate a meeting URL for a host (admin) with full participant permissions.
      *
      * @param meeting
      *            the virtual meeting
      * @param strIdentity
-     *            the agent unique identity (e.g. AdminUser access code)
+     *            the host unique identity (e.g. AdminUser access code)
      * @param strDisplayName
-     *            the agent display name
+     *            the host display name
      * @param notBefore
      *            the earliest date/time the token becomes valid ({@code null} for immediate validity)
      * @return the meeting URL with a fresh token
      */
-    public String getAgentMeetingUrl( VirtualMeeting meeting, String strIdentity, String strDisplayName, Date notBefore )
+    public String getHostMeetingUrl( VirtualMeeting meeting, String strIdentity, String strDisplayName, Date notBefore )
     {
         IVirtualMeetingProvider provider = getProvider( meeting.getProvider( ) );
 
@@ -164,19 +171,19 @@ public class VirtualMeetingService
     }
 
     /**
-     * Generate a meeting URL for a user with full participant permissions.
+     * Generate a meeting URL for a guest with full participant permissions.
      *
      * @param meeting
      *            the virtual meeting
      * @param strIdentity
-     *            the user unique identity (e.g. email or GUID)
+     *            the guest unique identity (e.g. email or GUID)
      * @param strDisplayName
-     *            the user display name
+     *            the guest display name
      * @param notBefore
      *            the earliest date/time the token becomes valid ({@code null} for immediate validity)
      * @return the meeting URL with a fresh token
      */
-    public String getUserMeetingUrl( VirtualMeeting meeting, String strIdentity, String strDisplayName, Date notBefore )
+    public String getGuestMeetingUrl( VirtualMeeting meeting, String strIdentity, String strDisplayName, Date notBefore )
     {
         IVirtualMeetingProvider provider = getProvider( meeting.getProvider( ) );
 

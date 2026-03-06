@@ -4,8 +4,8 @@
 CREATE TABLE IF NOT EXISTS workflow_task_addvirtualmeeting_config (
     id_task INT NOT NULL,
     provider VARCHAR(255) NOT NULL DEFAULT '',
-    id_entry_user_link INT NOT NULL DEFAULT 0,
-    id_entry_agent_link INT NOT NULL DEFAULT 0,
+    id_entry_guest_link INT NOT NULL DEFAULT 0,
+    id_entry_host_link INT NOT NULL DEFAULT 0,
     PRIMARY KEY (id_task)
 );
 
@@ -14,7 +14,8 @@ CREATE TABLE IF NOT EXISTS workflow_task_addvirtualmeeting_config (
 --
 CREATE TABLE IF NOT EXISTS virtualmeeting_room (
     id_virtualmeeting INT AUTO_INCREMENT,
-    id_appointment INT NOT NULL,
+    id_resource VARCHAR(255) NOT NULL DEFAULT '',
+    resource_type VARCHAR(255) NOT NULL DEFAULT '',
     room_name VARCHAR(255) NOT NULL,
     provider VARCHAR(255) NOT NULL,
     creation_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -22,12 +23,12 @@ CREATE TABLE IF NOT EXISTS virtualmeeting_room (
 );
 
 --
--- Table structure for task information (agent URL shown in workflow history)
+-- Table structure for task information (host URL shown in workflow history)
 --
 CREATE TABLE IF NOT EXISTS workflow_task_virtualmeeting_information (
     id_history INT NOT NULL,
     id_task INT NOT NULL,
-    agent_url VARCHAR(2000) NOT NULL DEFAULT '',
+    host_url VARCHAR(2000) NOT NULL DEFAULT '',
     error_message VARCHAR(2000) NOT NULL DEFAULT '',
     PRIMARY KEY (id_history, id_task)
 );

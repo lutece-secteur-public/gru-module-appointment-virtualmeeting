@@ -72,6 +72,6 @@ public class DeleteVirtualMeetingTask extends SimpleTask
     public boolean processTaskWithResult( int nIdResource, String strResourceType, int nIdResourceHistory, HttpServletRequest request, Locale locale,
             User user )
     {
-        return _virtualMeetingService.deleteMeeting( nIdResource );
+        return _virtualMeetingService.deleteMeeting( String.valueOf( nIdResource ), strResourceType );
     }
 }

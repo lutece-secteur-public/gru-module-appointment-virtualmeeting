@@ -36,12 +36,13 @@ package fr.paris.lutece.plugins.appointment.modules.virtualmeeting.business;
 import java.sql.Timestamp;
 
 /**
- * Business class representing a virtual meeting room associated with an appointment.
+ * Business class representing a virtual meeting room associated with a resource.
  */
 public class VirtualMeeting
 {
     private int _nIdVirtualMeeting;
-    private int _nIdAppointment;
+    private String _strIdResource;
+    private String _strResourceType;
     private String _strRoomName;
     private String _strProvider;
     private Timestamp _dateCreation;
@@ -56,14 +57,24 @@ public class VirtualMeeting
         _nIdVirtualMeeting = nIdVirtualMeeting;
     }
 
-    public int getIdAppointment( )
+    public String getIdResource( )
     {
-        return _nIdAppointment;
+        return _strIdResource;
     }
 
-    public void setIdAppointment( int nIdAppointment )
+    public void setIdResource( String strIdResource )
     {
-        _nIdAppointment = nIdAppointment;
+        _strIdResource = strIdResource;
+    }
+
+    public String getResourceType( )
+    {
+        return _strResourceType;
+    }
+
+    public void setResourceType( String strResourceType )
+    {
+        _strResourceType = strResourceType;
     }
 
     public String getRoomName( )

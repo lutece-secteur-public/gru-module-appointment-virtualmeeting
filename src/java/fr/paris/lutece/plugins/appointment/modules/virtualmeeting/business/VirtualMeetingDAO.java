@@ -43,17 +43,18 @@ import fr.paris.lutece.util.sql.DAOUtil;
  */
 public class VirtualMeetingDAO
 {
-    private static final String SQL_QUERY_INSERT = "INSERT INTO virtualmeeting_room ( id_appointment, room_name, provider, creation_date ) VALUES ( ?, ?, ?, ? )";
+    private static final String SQL_QUERY_INSERT = "INSERT INTO virtualmeeting_room ( id_resource, resource_type, room_name, provider, creation_date ) VALUES ( ?, ?, ?, ?, ? )";
     private static final String SQL_QUERY_DELETE = "DELETE FROM virtualmeeting_room WHERE id_virtualmeeting = ?";
-    private static final String SQL_QUERY_DELETE_BY_APPOINTMENT = "DELETE FROM virtualmeeting_room WHERE id_appointment = ?";
-    private static final String SQL_QUERY_SELECT_BY_APPOINTMENT = "SELECT id_virtualmeeting, id_appointment, room_name, provider, creation_date FROM virtualmeeting_room WHERE id_appointment = ?";
+    private static final String SQL_QUERY_DELETE_BY_RESOURCE = "DELETE FROM virtualmeeting_room WHERE id_resource = ? AND resource_type = ?";
+    private static final String SQL_QUERY_SELECT_BY_RESOURCE = "SELECT id_virtualmeeting, id_resource, resource_type, room_name, provider, creation_date FROM virtualmeeting_room WHERE id_resource = ? AND resource_type = ?";
 
     public void insert( VirtualMeeting virtualMeeting )
     {
         try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, Statement.RETURN_GENERATED_KEYS ) )
         {
             int nIndex = 1;
-            daoUtil.setInt( nIndex++, virtualMeeting.getIdAppointment( ) );
+            daoUtil.setString( nIndex++, virtualMeeting.getIdResource( ) );
+            daoUtil.setString( nIndex++, virtualMeeting.getResourceType( ) );
             daoUtil.setString( nIndex++, virtualMeeting.getRoomName( ) );
             daoUtil.setString( nIndex++, virtualMeeting.getProvider( ) );
             daoUtil.setTimestamp( nIndex, virtualMeeting.getCreationDate( ) );
@@ -76,20 +77,22 @@ public class VirtualMeetingDAO
         }
     }
 
-    public void deleteByAppointmentId( int nIdAppointment )
+    public void deleteByResourceId( String strIdResource, String strResourceType )
     {
-        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE_BY_APPOINTMENT ) )
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE_BY_RESOURCE ) )
         {
-            daoUtil.setInt( 1, nIdAppointment );
+            daoUtil.setString( 1, strIdResource );
+            daoUtil.setString( 2, strResourceType );
             daoUtil.executeUpdate( );
         }
     }
 
-    public VirtualMeeting findByAppointmentId( int nIdAppointment )
+    public VirtualMeeting findByResourceId( String strIdResource, String strResourceType )
     {
-        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_BY_APPOINTMENT ) )
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_BY_RESOURCE ) )
         {
-            daoUtil.setInt( 1, nIdAppointment );
+            daoUtil.setString( 1, strIdResource );
+            daoUtil.setString( 2, strResourceType );
             daoUtil.executeQuery( );
 
             if ( daoUtil.next( ) )
@@ -107,7 +110,8 @@ public class VirtualMeetingDAO
         int nIndex = 1;
 
         virtualMeeting.setIdVirtualMeeting( daoUtil.getInt( nIndex++ ) );
-        virtualMeeting.setIdAppointment( daoUtil.getInt( nIndex++ ) );
+        virtualMeeting.setIdResource( daoUtil.getString( nIndex++ ) );
+        virtualMeeting.setResourceType( daoUtil.getString( nIndex++ ) );
         virtualMeeting.setRoomName( daoUtil.getString( nIndex++ ) );
         virtualMeeting.setProvider( daoUtil.getString( nIndex++ ) );
         virtualMeeting.setCreationDate( daoUtil.getTimestamp( nIndex ) );

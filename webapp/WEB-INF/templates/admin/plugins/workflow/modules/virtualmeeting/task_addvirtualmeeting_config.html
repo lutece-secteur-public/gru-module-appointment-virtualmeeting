@@ -9,21 +9,21 @@
 </div>
 
 <div class="form-group">
-    <label for="idEntryUserLink">#i18n{module.appointment.virtualmeeting.task.config.labelEntryUserLink}</label>
-    <select name="idEntryUserLink" id="idEntryUserLink" class="form-control">
+    <label for="idEntryGuestLink">#i18n{module.appointment.virtualmeeting.task.config.labelEntryGuestLink}</label>
+    <select name="idEntryGuestLink" id="idEntryGuestLink" class="form-control">
         <#list entry_list as item>
-            <option value="${item.code}" <#if config.idEntryUserLink?? && config.idEntryUserLink == item.code?number>selected</#if>>${item.name}</option>
+            <option value="${item.code}" <#if config.idEntryGuestLink?? && config.idEntryGuestLink == item.code?number>selected</#if>>${item.name}</option>
         </#list>
     </select>
-    <small class="form-text text-muted">#i18n{module.appointment.virtualmeeting.task.config.labelEntryUserLink.help}</small>
+    <small class="form-text text-muted">#i18n{module.appointment.virtualmeeting.task.config.labelEntryGuestLink.help}</small>
 </div>
 
 <div class="form-group">
-    <label for="idEntryAgentLink">#i18n{module.appointment.virtualmeeting.task.config.labelEntryAgentLink}</label>
-    <select name="idEntryAgentLink" id="idEntryAgentLink" class="form-control">
+    <label for="idEntryHostLink">#i18n{module.appointment.virtualmeeting.task.config.labelEntryHostLink}</label>
+    <select name="idEntryHostLink" id="idEntryHostLink" class="form-control">
         <#list entry_list as item>
-            <option value="${item.code}" <#if config.idEntryAgentLink?? && config.idEntryAgentLink == item.code?number>selected</#if>>${item.name}</option>
+            <option value="${item.code}" <#if config.idEntryHostLink?? && config.idEntryHostLink == item.code?number>selected</#if>>${item.name}</option>
         </#list>
     </select>
-    <small class="form-text text-muted">#i18n{module.appointment.virtualmeeting.task.config.labelEntryAgentLink.help}</small>
+    <small class="form-text text-muted">#i18n{module.appointment.virtualmeeting.task.config.labelEntryHostLink.help}</small>
 </div>

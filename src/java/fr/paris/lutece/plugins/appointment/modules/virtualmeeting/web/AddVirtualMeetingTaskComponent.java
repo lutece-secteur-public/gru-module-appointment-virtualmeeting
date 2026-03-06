@@ -73,7 +73,7 @@ public class AddVirtualMeetingTaskComponent extends AbstractTaskComponent
     private static final String MARK_CONFIG = "config";
     private static final String MARK_PROVIDER_LIST = "provider_list";
     private static final String MARK_ENTRY_LIST = "entry_list";
-    private static final String MARK_AGENT_URL = "agent_url";
+    private static final String MARK_HOST_URL = "host_url";
     private static final String MARK_ERROR_MESSAGE = "error_message";
 
     // Beans
@@ -127,7 +127,7 @@ public class AddVirtualMeetingTaskComponent extends AbstractTaskComponent
         if ( information != null )
         {
             Map<String, Object> model = new HashMap<>( );
-            model.put( MARK_AGENT_URL, information.getAgentUrl( ) );
+            model.put( MARK_HOST_URL, information.getHostUrl( ) );
             model.put( MARK_ERROR_MESSAGE, information.getErrorMessage( ) );
 
             HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_TASK_INFORMATION, locale, model );

@@ -103,7 +103,8 @@ public class AddVirtualMeetingTask extends SimpleTask
             return false;
         }
 
-        VirtualMeeting meeting = _virtualMeetingService.createMeeting( nIdResource, config.getProvider( ) );
+        String strIdResource = String.valueOf( nIdResource );
+        VirtualMeeting meeting = _virtualMeetingService.createMeeting( strIdResource, strResourceType, config.getProvider( ) );
 
         if ( meeting == null )
         {
@@ -111,12 +112,12 @@ public class AddVirtualMeetingTask extends SimpleTask
             return false;
         }
 
-        // Store the agent URL in the task information table for workflow history display
-        String strAgentUrl = _virtualMeetingService.getAgentMeetingUrl( meeting, "agent-" + nIdResource, "Agent", null );
+        // Store the host URL in the task information table for workflow history display
+        String strHostUrl = _virtualMeetingService.getHostMeetingUrl( meeting, "host-" + nIdResource, "Host", null );
 
-        if ( strAgentUrl != null )
+        if ( strHostUrl != null )
         {
-            VirtualMeetingTaskInformationHome.create( new VirtualMeetingTaskInformation( nIdResourceHistory, getId( ), strAgentUrl ) );
+            VirtualMeetingTaskInformationHome.create( new VirtualMeetingTaskInformation( nIdResourceHistory, getId( ), strHostUrl ) );
         }
 
         writeUrlsToResponses( nIdResource, config, meeting );
@@ -130,10 +131,10 @@ public class AddVirtualMeetingTask extends SimpleTask
      */
     private void writeUrlsToResponses( int nIdAppointment, AddVirtualMeetingTaskConfig config, VirtualMeeting meeting )
     {
-        int nIdEntryUserLink = config.getIdEntryUserLink( );
-        int nIdEntryAgentLink = config.getIdEntryAgentLink( );
+        int nIdEntryGuestLink = config.getIdEntryGuestLink( );
+        int nIdEntryHostLink = config.getIdEntryHostLink( );
 
-        if ( nIdEntryUserLink == 0 && nIdEntryAgentLink == 0 )
+        if ( nIdEntryGuestLink == 0 && nIdEntryHostLink == 0 )
         {
             return;
         }
@@ -150,23 +151,23 @@ public class AddVirtualMeetingTask extends SimpleTask
 
             String strDisplayName = appointment.getFirstName( ) + " " + appointment.getLastName( );
 
-            if ( nIdEntryUserLink > 0 )
+            if ( nIdEntryGuestLink > 0 )
             {
-                String strUserUrl = _virtualMeetingService.getUserMeetingUrl( meeting, appointment.getEmail( ), strDisplayName, null );
+                String strGuestUrl = _virtualMeetingService.getGuestMeetingUrl( meeting, appointment.getEmail( ), strDisplayName, null );
 
-                if ( strUserUrl != null )
+                if ( strGuestUrl != null )
                 {
-                    writeUrlToResponse( nIdAppointment, nIdEntryUserLink, strUserUrl );
+                    writeUrlToResponse( nIdAppointment, nIdEntryGuestLink, strGuestUrl );
                 }
             }
 
-            if ( nIdEntryAgentLink > 0 )
+            if ( nIdEntryHostLink > 0 )
             {
-                String strAgentUrl = _virtualMeetingService.getAgentMeetingUrl( meeting, "agent-" + nIdAppointment, "Agent", null );
+                String strHostUrl = _virtualMeetingService.getHostMeetingUrl( meeting, "host-" + nIdAppointment, "Host", null );
 
-                if ( strAgentUrl != null )
+                if ( strHostUrl != null )
                 {
-                    writeUrlToResponse( nIdAppointment, nIdEntryAgentLink, strAgentUrl );
+                    writeUrlToResponse( nIdAppointment, nIdEntryHostLink, strHostUrl );
                 }
             }
         }
@@ -208,7 +209,7 @@ public class AddVirtualMeetingTask extends SimpleTask
         VirtualMeetingTaskInformation information = new VirtualMeetingTaskInformation( );
         information.setIdHistory( nIdResourceHistory );
         information.setIdTask( getId( ) );
-        information.setAgentUrl( "" );
+        information.setHostUrl( "" );
         information.setErrorMessage( I18nService.getLocalizedString( strMessageKey, locale ) );
         VirtualMeetingTaskInformationHome.create( information );
     }

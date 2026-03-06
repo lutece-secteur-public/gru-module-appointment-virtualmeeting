@@ -45,11 +45,11 @@ import java.sql.Statement;
 public class AddVirtualMeetingTaskConfigDAO implements ITaskConfigDAO<AddVirtualMeetingTaskConfig>
 {
     // Constants
-    private static final String SQL_QUERY_INSERT = "INSERT INTO workflow_task_addvirtualmeeting_config ( id_task, provider, id_entry_user_link, id_entry_agent_link ) VALUES ( ?, ?, ?, ? )";
+    private static final String SQL_QUERY_INSERT = "INSERT INTO workflow_task_addvirtualmeeting_config ( id_task, provider, id_entry_guest_link, id_entry_host_link ) VALUES ( ?, ?, ?, ? )";
     private static final String SQL_QUERY_DELETE = "DELETE FROM workflow_task_addvirtualmeeting_config WHERE id_task = ? ";
-    private static final String SQL_QUERY_UPDATE = "UPDATE workflow_task_addvirtualmeeting_config SET provider = ?, id_entry_user_link = ?, id_entry_agent_link = ? WHERE id_task = ?";
+    private static final String SQL_QUERY_UPDATE = "UPDATE workflow_task_addvirtualmeeting_config SET provider = ?, id_entry_guest_link = ?, id_entry_host_link = ? WHERE id_task = ?";
 
-    private static final String SQL_QUERY_SELECTALL = "SELECT id_task, provider, id_entry_user_link, id_entry_agent_link FROM workflow_task_addvirtualmeeting_config";
+    private static final String SQL_QUERY_SELECTALL = "SELECT id_task, provider, id_entry_guest_link, id_entry_host_link FROM workflow_task_addvirtualmeeting_config";
     private static final String SQL_QUERY_SELECT_BY_ID = SQL_QUERY_SELECTALL + " WHERE id_task = ?";
 
     /**
@@ -63,8 +63,8 @@ public class AddVirtualMeetingTaskConfigDAO implements ITaskConfigDAO<AddVirtual
             int nIndex = 1;
             daoUtil.setInt( nIndex++, addVirtualMeetingTaskConfig.getIdTask( ) );
             daoUtil.setString( nIndex++, addVirtualMeetingTaskConfig.getProvider( ) );
-            daoUtil.setInt( nIndex++, addVirtualMeetingTaskConfig.getIdEntryUserLink( ) );
-            daoUtil.setInt( nIndex++, addVirtualMeetingTaskConfig.getIdEntryAgentLink( ) );
+            daoUtil.setInt( nIndex++, addVirtualMeetingTaskConfig.getIdEntryGuestLink( ) );
+            daoUtil.setInt( nIndex++, addVirtualMeetingTaskConfig.getIdEntryHostLink( ) );
 
             daoUtil.executeUpdate( );
 
@@ -83,8 +83,8 @@ public class AddVirtualMeetingTaskConfigDAO implements ITaskConfigDAO<AddVirtual
             int nIndex = 1;
 
             daoUtil.setString( nIndex++, addVirtualMeetingTaskConfig.getProvider( ) );
-            daoUtil.setInt( nIndex++, addVirtualMeetingTaskConfig.getIdEntryUserLink( ) );
-            daoUtil.setInt( nIndex++, addVirtualMeetingTaskConfig.getIdEntryAgentLink( ) );
+            daoUtil.setInt( nIndex++, addVirtualMeetingTaskConfig.getIdEntryGuestLink( ) );
+            daoUtil.setInt( nIndex++, addVirtualMeetingTaskConfig.getIdEntryHostLink( ) );
             daoUtil.setInt( nIndex, addVirtualMeetingTaskConfig.getIdTask( ) );
 
             daoUtil.executeUpdate( );
@@ -131,8 +131,8 @@ public class AddVirtualMeetingTaskConfigDAO implements ITaskConfigDAO<AddVirtual
 
         addVirtualMeetingTaskConfig.setIdTask( daoUtil.getInt( nIndex++ ) );
         addVirtualMeetingTaskConfig.setProvider( daoUtil.getString( nIndex++ ) );
-        addVirtualMeetingTaskConfig.setIdEntryUserLink( daoUtil.getInt( nIndex++ ) );
-        addVirtualMeetingTaskConfig.setIdEntryAgentLink( daoUtil.getInt( nIndex ) );
+        addVirtualMeetingTaskConfig.setIdEntryGuestLink( daoUtil.getInt( nIndex++ ) );
+        addVirtualMeetingTaskConfig.setIdEntryHostLink( daoUtil.getInt( nIndex ) );
 
         return addVirtualMeetingTaskConfig;
     }

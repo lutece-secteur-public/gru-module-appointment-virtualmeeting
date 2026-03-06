@@ -62,13 +62,13 @@ public final class VirtualMeetingHome
         getDAO( ).delete( nIdVirtualMeeting );
     }
 
-    public static void removeByAppointmentId( int nIdAppointment )
+    public static void removeByResourceId( String strIdResource, String strResourceType )
     {
-        getDAO( ).deleteByAppointmentId( nIdAppointment );
+        getDAO( ).deleteByResourceId( strIdResource, strResourceType );
     }
 
-    public static VirtualMeeting findByAppointmentId( int nIdAppointment )
+    public static VirtualMeeting findByResourceId( String strIdResource, String strResourceType )
     {
-        return getDAO( ).findByAppointmentId( nIdAppointment );
+        return getDAO( ).findByResourceId( strIdResource, strResourceType );
     }
 }
