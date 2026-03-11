@@ -81,6 +81,8 @@ public class AddVirtualMeetingTaskComponent extends AbstractTaskComponent
 
     // Constants
     private static final String RESOURCE_TYPE_APPOINTMENT = "APPOINTMENT_FORM";
+    private static final String ENTRY_TYPE_TEXT = "appointment.entryTypeText";
+    private static final String ENTRY_TYPE_TEXT_AREA = "appointment.entryTypeTextArea";
 
     @Override
     public String getDisplayConfigForm( HttpServletRequest request, Locale locale, ITask task )
@@ -184,7 +186,12 @@ public class AddVirtualMeetingTaskComponent extends AbstractTaskComponent
 
                     for ( Entry entry : EntryHome.getEntryList( filter ) )
                     {
-                        list.addItem( String.valueOf( entry.getIdEntry( ) ), entry.getTitle( ) );
+                        String strBeanName = entry.getEntryType( ).getBeanName( );
+
+                        if ( ENTRY_TYPE_TEXT.equals( strBeanName ) || ENTRY_TYPE_TEXT_AREA.equals( strBeanName ) )
+                        {
+                            list.addItem( String.valueOf( entry.getIdEntry( ) ), entry.getTitle( ) );
+                        }
                     }
                 }
             }
