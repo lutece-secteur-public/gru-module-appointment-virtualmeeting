@@ -1,0 +1,32 @@
+<#if guest_url?? && guest_url?has_content>
+    <div class="form-group">
+        <label>#i18n{module.appointment.virtualmeeting.addon.labelLink}</label>
+        <div><a href="${guest_url}" target="_blank">${guest_url}</a></div>
+    </div>
+</#if>
+<#-- Host link hidden from appointment view
+<#if host_url?? && host_url?has_content>
+    <div class="form-group">
+        <label>#i18n{module.appointment.virtualmeeting.addon.labelLink}</label>
+        <div><a href="${host_url}" target="_blank">${host_url}</a></div>
+    </div>
+</#if>
+-->
+<#-- Linkify plain-text URLs already shown in the form response list above -->
+<script>
+(function(){
+    var urls = [];
+    <#if guest_url?? && guest_url?has_content>urls.push("${guest_url?js_string}");</#if>
+    <#if host_url?? && host_url?has_content>urls.push("${host_url?js_string}");</#if>
+    if(!urls.length) return;
+    document.querySelectorAll('p.form-control-plaintext, p.form-control-static').forEach(function(el){
+        var text = el.textContent.trim();
+        for(var i=0;i<urls.length;i++){
+            if(text === urls[i]){
+                el.innerHTML = '<a href="' + urls[i].replace(/"/g,'&quot;') + '" target="_blank">' + urls[i].replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</a>';
+                break;
+            }
+        }
+    });
+})();
+</script>

@@ -11,78 +11,82 @@
        http://www.springframework.org/schema/tx
        http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
        
-    <!-- ======================== DAOs ======================== -->
+      <!-- ======================== DAOs ======================== -->
 
-    <bean id="appointment-virtualmeeting.addVirtualMeetingTaskConfigDAO"
-          class="fr.paris.lutece.plugins.appointment.modules.virtualmeeting.business.AddVirtualMeetingTaskConfigDAO" />
+      <bean id="appointment-virtualmeeting.addVirtualMeetingTaskConfigDAO"
+            class="fr.paris.lutece.plugins.appointment.modules.virtualmeeting.business.AddVirtualMeetingTaskConfigDAO" />
 
-    <bean id="appointment-virtualmeeting.virtualMeetingDAO"
-          class="fr.paris.lutece.plugins.appointment.modules.virtualmeeting.business.VirtualMeetingDAO" />
+      <bean id="appointment-virtualmeeting.virtualMeetingDAO"
+            class="fr.paris.lutece.plugins.appointment.modules.virtualmeeting.business.VirtualMeetingDAO" />
 
-    <bean id="appointment-virtualmeeting.virtualMeetingTaskInformationDAO"
-          class="fr.paris.lutece.plugins.appointment.modules.virtualmeeting.business.VirtualMeetingTaskInformationDAO" />
+      <bean id="appointment-virtualmeeting.virtualMeetingTaskInformationDAO"
+            class="fr.paris.lutece.plugins.appointment.modules.virtualmeeting.business.VirtualMeetingTaskInformationDAO" />
 
-    <!-- ======================== Services ======================== -->
+      <!-- ======================== Services ======================== -->
 
-    <bean id="appointment-virtualmeeting.virtualMeetingService"
-          class="fr.paris.lutece.plugins.appointment.modules.virtualmeeting.service.VirtualMeetingService" />
+      <bean id="appointment-virtualmeeting.virtualMeetingService"
+            class="fr.paris.lutece.plugins.appointment.modules.virtualmeeting.service.VirtualMeetingService" />
+            
+            <bean id="appointment-virtualmeeting.appointmentAddonService"                                                                                                                                                                                                             
+            class="fr.paris.lutece.plugins.appointment.modules.virtualmeeting.service.VirtualMeetingAppointmentAddonService" />
 
-    <bean id="appointment-virtualmeeting.addVirtualMeetingTaskService"
-          class="fr.paris.lutece.plugins.appointment.modules.virtualmeeting.service.AddVirtualMeetingTaskService"
-          p:taskConfigDAO-ref="appointment-virtualmeeting.addVirtualMeetingTaskConfigDAO" />
 
-    <!-- ======================== Config Beans ======================== -->
+      <bean id="appointment-virtualmeeting.addVirtualMeetingTaskService"
+            class="fr.paris.lutece.plugins.appointment.modules.virtualmeeting.service.AddVirtualMeetingTaskService"
+            p:taskConfigDAO-ref="appointment-virtualmeeting.addVirtualMeetingTaskConfigDAO" />
 
-    <bean id="appointment-virtualmeeting.addVirtualMeetingTaskConfig"
-          class="fr.paris.lutece.plugins.appointment.modules.virtualmeeting.business.AddVirtualMeetingTaskConfig"
-          scope="prototype" />
+      <!-- ======================== Config Beans ======================== -->
 
-    <!-- ======================== Task Types ======================== -->
+      <bean id="appointment-virtualmeeting.addVirtualMeetingTaskConfig"
+            class="fr.paris.lutece.plugins.appointment.modules.virtualmeeting.business.AddVirtualMeetingTaskConfig"
+            scope="prototype" />
 
-    <bean id="appointment-virtualmeeting.addVirtualMeetingTaskType"
-          class="fr.paris.lutece.plugins.workflowcore.business.task.TaskType"
-          p:key="addVirtualMeetingTask"
-          p:titleI18nKey="module.appointment.virtualmeeting.task.addVirtualMeeting.title"
-          p:beanName="appointment-virtualmeeting.addVirtualMeetingTask"
-          p:configBeanName="appointment-virtualmeeting.addVirtualMeetingTaskConfig"
-          p:configRequired="true"
-          p:formTaskRequired="false"
-          p:taskForAutomaticAction="true" />
+      <!-- ======================== Task Types ======================== -->
 
-    <!-- TODO: DeleteVirtualMeetingTask is disabled until room deletion is supported by all providers
-    <bean id="appointment-virtualmeeting.deleteVirtualMeetingTaskType"
-          class="fr.paris.lutece.plugins.workflowcore.business.task.TaskType"
-          p:key="deleteVirtualMeetingTask"
-          p:titleI18nKey="module.appointment.virtualmeeting.task.deleteVirtualMeeting.title"
-          p:beanName="appointment-virtualmeeting.deleteVirtualMeetingTask"
-          p:configRequired="false"
-          p:formTaskRequired="false"
-          p:taskForAutomaticAction="true" />
-    -->
+      <bean id="appointment-virtualmeeting.addVirtualMeetingTaskType"
+            class="fr.paris.lutece.plugins.workflowcore.business.task.TaskType"
+            p:key="addVirtualMeetingTask"
+            p:titleI18nKey="module.appointment.virtualmeeting.task.addVirtualMeeting.title"
+            p:beanName="appointment-virtualmeeting.addVirtualMeetingTask"
+            p:configBeanName="appointment-virtualmeeting.addVirtualMeetingTaskConfig"
+            p:configRequired="true"
+            p:formTaskRequired="false"
+            p:taskForAutomaticAction="true" />
 
-    <!-- ======================== Tasks ======================== -->
+      <!-- TODO: DeleteVirtualMeetingTask is disabled until room deletion is supported by all providers
+      <bean id="appointment-virtualmeeting.deleteVirtualMeetingTaskType"
+            class="fr.paris.lutece.plugins.workflowcore.business.task.TaskType"
+            p:key="deleteVirtualMeetingTask"
+            p:titleI18nKey="module.appointment.virtualmeeting.task.deleteVirtualMeeting.title"
+            p:beanName="appointment-virtualmeeting.deleteVirtualMeetingTask"
+            p:configRequired="false"
+            p:formTaskRequired="false"
+            p:taskForAutomaticAction="true" />
+      -->
 
-    <bean id="appointment-virtualmeeting.addVirtualMeetingTask"
-          class="fr.paris.lutece.plugins.appointment.modules.virtualmeeting.service.AddVirtualMeetingTask"
-          scope="prototype" />
+      <!-- ======================== Tasks ======================== -->
 
-    <!-- TODO: DeleteVirtualMeetingTask is disabled until room deletion is supported by all providers
-    <bean id="appointment-virtualmeeting.deleteVirtualMeetingTask"
-          class="fr.paris.lutece.plugins.appointment.modules.virtualmeeting.service.DeleteVirtualMeetingTask"
-          scope="prototype" />
-    -->
+      <bean id="appointment-virtualmeeting.addVirtualMeetingTask"
+            class="fr.paris.lutece.plugins.appointment.modules.virtualmeeting.service.AddVirtualMeetingTask"
+            scope="prototype" />
 
-    <!-- ======================== Task Components ======================== -->
+      <!-- TODO: DeleteVirtualMeetingTask is disabled until room deletion is supported by all providers
+      <bean id="appointment-virtualmeeting.deleteVirtualMeetingTask"
+            class="fr.paris.lutece.plugins.appointment.modules.virtualmeeting.service.DeleteVirtualMeetingTask"
+            scope="prototype" />
+      -->
 
-    <bean id="appointment-virtualmeeting.addVirtualMeetingTaskComponent"
-          class="fr.paris.lutece.plugins.appointment.modules.virtualmeeting.web.AddVirtualMeetingTaskComponent"
-          p:taskType-ref="appointment-virtualmeeting.addVirtualMeetingTaskType"
-          p:taskConfigService-ref="appointment-virtualmeeting.addVirtualMeetingTaskService" />
+      <!-- ======================== Task Components ======================== -->
 
-    <!-- TODO: DeleteVirtualMeetingTask is disabled until room deletion is supported by all providers
-    <bean id="appointment-virtualmeeting.deleteVirtualMeetingTaskComponent"
-          class="fr.paris.lutece.plugins.appointment.modules.virtualmeeting.web.DeleteVirtualMeetingTaskComponent"
-          p:taskType-ref="appointment-virtualmeeting.deleteVirtualMeetingTaskType" />
-    -->
+      <bean id="appointment-virtualmeeting.addVirtualMeetingTaskComponent"
+            class="fr.paris.lutece.plugins.appointment.modules.virtualmeeting.web.AddVirtualMeetingTaskComponent"
+            p:taskType-ref="appointment-virtualmeeting.addVirtualMeetingTaskType"
+            p:taskConfigService-ref="appointment-virtualmeeting.addVirtualMeetingTaskService" />
+
+      <!-- TODO: DeleteVirtualMeetingTask is disabled until room deletion is supported by all providers
+      <bean id="appointment-virtualmeeting.deleteVirtualMeetingTaskComponent"
+            class="fr.paris.lutece.plugins.appointment.modules.virtualmeeting.web.DeleteVirtualMeetingTaskComponent"
+            p:taskType-ref="appointment-virtualmeeting.deleteVirtualMeetingTaskType" />
+      -->
 
 </beans>
