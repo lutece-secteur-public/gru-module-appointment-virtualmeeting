@@ -46,6 +46,7 @@ import javax.inject.Named;
 import fr.paris.lutece.plugins.appointment.business.form.Form;
 import fr.paris.lutece.plugins.appointment.business.form.FormHome;
 import fr.paris.lutece.plugins.appointment.modules.virtualmeeting.business.AddVirtualMeetingTaskConfig;
+import fr.paris.lutece.plugins.appointment.modules.virtualmeeting.business.VirtualMeetingEntryIds;
 import fr.paris.lutece.plugins.appointment.service.AppointmentResponseService;
 import fr.paris.lutece.plugins.appointment.service.AppointmentService;
 import fr.paris.lutece.plugins.appointment.service.addon.IAppointmentAddonService;
@@ -73,6 +74,8 @@ public class VirtualMeetingAppointmentAddonService implements IAppointmentAddonS
     // Markers
     private static final String MARK_GUEST_URL = "guest_url";
     private static final String MARK_HOST_URL = "host_url";
+    private static final String MARK_GUEST_ENTRY_IDS = "guest_entry_ids";
+    private static final String MARK_HOST_ENTRY_IDS = "host_entry_ids";
 
     // Beans
     private static final String BEAN_ACTION_SERVICE = "workflow.actionService";
@@ -90,6 +93,10 @@ public class VirtualMeetingAppointmentAddonService implements IAppointmentAddonS
     @Inject
     @Named( BEAN_CONFIG_SERVICE )
     private ITaskConfigService _taskConfigService;
+
+    @Inject
+    @Named( "appointment-virtualmeeting.entryIdsCacheService" )
+    private VirtualMeetingEntryIdsCacheService _cacheService;
 
     @Override
     public String getAppointmentAddOn( int nIdAppointment, Locale locale )
@@ -110,36 +117,10 @@ public class VirtualMeetingAppointmentAddonService implements IAppointmentAddonS
                 return "";
             }
 
-            // Collect all configured entry IDs for guest and host links across all workflow actions/tasks
-            Set<Integer> setGuestEntryIds = new HashSet<>( );
-            Set<Integer> setHostEntryIds = new HashSet<>( );
-
-            ActionFilter filter = new ActionFilter( );
-            filter.setIdWorkflow( form.getIdWorkflow( ) );
-            List<Action> listActions = _actionService.getListActionByFilter( filter );
-
-            for ( Action action : listActions )
-            {
-                List<ITask> listTasks = _taskService.getListTaskByIdAction( action.getId( ), locale );
-
-                for ( ITask task : listTasks )
-                {
-                    AddVirtualMeetingTaskConfig config = _taskConfigService.findByPrimaryKey( task.getId( ) );
-
-                    if ( config != null )
-                    {
-                        if ( config.getIdEntryGuestLink( ) > 0 )
-                        {
-                            setGuestEntryIds.add( config.getIdEntryGuestLink( ) );
-                        }
-
-                        if ( config.getIdEntryHostLink( ) > 0 )
-                        {
-                            setHostEntryIds.add( config.getIdEntryHostLink( ) );
-                        }
-                    }
-                }
-            }
+            // Resolve entry IDs from workflow config (cached)
+            VirtualMeetingEntryIds entryIds = resolveEntryIds( form.getIdWorkflow( ), locale );
+            Set<Integer> setGuestEntryIds = entryIds.getGuestEntryIds( );
+            Set<Integer> setHostEntryIds = entryIds.getHostEntryIds( );
 
             if ( setGuestEntryIds.isEmpty( ) && setHostEntryIds.isEmpty( ) )
             {
@@ -186,6 +167,8 @@ public class VirtualMeetingAppointmentAddonService implements IAppointmentAddonS
             Map<String, Object> model = new HashMap<>( );
             model.put( MARK_GUEST_URL, strGuestUrl );
             model.put( MARK_HOST_URL, strHostUrl );
+            model.put( MARK_GUEST_ENTRY_IDS, setGuestEntryIds );
+            model.put( MARK_HOST_ENTRY_IDS, setHostEntryIds );
 
             HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_ADDON, locale, model );
             return template.getHtml( );
@@ -195,5 +178,70 @@ public class VirtualMeetingAppointmentAddonService implements IAppointmentAddonS
             AppLogService.error( "VirtualMeetingAppointmentAddonService — failed to build addon for appointment {}", nIdAppointment, e );
             return "";
         }
+    }
+
+    /**
+     * Resolves the guest and host entry IDs for a given workflow by scanning its actions, tasks, and task configs.
+     * Results are cached by workflow ID to avoid repeated DAO lookups.
+     *
+     * @param nIdWorkflow
+     *            the workflow ID
+     * @param locale
+     *            the locale for task resolution
+     * @return the resolved entry IDs
+     */
+    private VirtualMeetingEntryIds resolveEntryIds( int nIdWorkflow, Locale locale )
+    {
+        // Check cache first
+        if ( _cacheService.isCacheEnable( ) )
+        {
+            VirtualMeetingEntryIds cached = _cacheService.getEntryIds( nIdWorkflow );
+
+            if ( cached != null )
+            {
+                return cached;
+            }
+        }
+
+        // Scan workflow actions → tasks → configs to collect entry IDs
+        Set<Integer> setGuestEntryIds = new HashSet<>( );
+        Set<Integer> setHostEntryIds = new HashSet<>( );
+
+        ActionFilter filter = new ActionFilter( );
+        filter.setIdWorkflow( nIdWorkflow );
+        List<Action> listActions = _actionService.getListActionByFilter( filter );
+
+        for ( Action action : listActions )
+        {
+            List<ITask> listTasks = _taskService.getListTaskByIdAction( action.getId( ), locale );
+
+            for ( ITask task : listTasks )
+            {
+                AddVirtualMeetingTaskConfig config = _taskConfigService.findByPrimaryKey( task.getId( ) );
+
+                if ( config != null )
+                {
+                    if ( config.getIdEntryGuestLink( ) > 0 )
+                    {
+                        setGuestEntryIds.add( config.getIdEntryGuestLink( ) );
+                    }
+
+                    if ( config.getIdEntryHostLink( ) > 0 )
+                    {
+                        setHostEntryIds.add( config.getIdEntryHostLink( ) );
+                    }
+                }
+            }
+        }
+
+        VirtualMeetingEntryIds entryIds = new VirtualMeetingEntryIds( setGuestEntryIds, setHostEntryIds );
+
+        // Store in cache
+        if ( _cacheService.isCacheEnable( ) )
+        {
+            _cacheService.putEntryIds( nIdWorkflow, entryIds );
+        }
+
+        return entryIds;
     }
 }

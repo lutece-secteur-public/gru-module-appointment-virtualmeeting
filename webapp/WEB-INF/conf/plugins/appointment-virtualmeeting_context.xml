@@ -27,8 +27,11 @@
       <bean id="appointment-virtualmeeting.virtualMeetingService"
             class="fr.paris.lutece.plugins.appointment.modules.virtualmeeting.service.VirtualMeetingService" />
             
-            <bean id="appointment-virtualmeeting.appointmentAddonService"                                                                                                                                                                                                             
+      <bean id="appointment-virtualmeeting.appointmentAddonService"                                                                                                                                                                                                             
             class="fr.paris.lutece.plugins.appointment.modules.virtualmeeting.service.VirtualMeetingAppointmentAddonService" />
+
+      <bean id="appointment-virtualmeeting.entryIdsCacheService" 
+            class="fr.paris.lutece.plugins.appointment.modules.virtualmeeting.service.VirtualMeetingEntryIdsCacheService" />
 
 
       <bean id="appointment-virtualmeeting.addVirtualMeetingTaskService"
@@ -88,5 +91,7 @@
             class="fr.paris.lutece.plugins.appointment.modules.virtualmeeting.web.DeleteVirtualMeetingTaskComponent"
             p:taskType-ref="appointment-virtualmeeting.deleteVirtualMeetingTaskType" />
       -->
+
+      
 
 </beans>
