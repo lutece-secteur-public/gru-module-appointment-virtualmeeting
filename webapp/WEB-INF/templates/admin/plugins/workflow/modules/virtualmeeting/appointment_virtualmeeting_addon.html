@@ -15,7 +15,7 @@
     var allIds = guestIds.concat(hostIds);
     if(!allIds.length) return;
     allIds.forEach(function(id){
-        var el = document.querySelector('p.form-control-plaintext[data-id-entry="' + id + '"]');
+        var el = document.querySelector('[data-id-entry="' + id + '"]');
         if(el){
             var text = el.textContent.trim();
             if(text && (text.startsWith('http://') || text.startsWith('https://'))){
