@@ -42,7 +42,6 @@ import fr.paris.lutece.portal.service.cache.AbstractCacheableService;
  * Cache service that stores the mapping from workflow ID to resolved guest/host entry IDs.
  * This avoids repeated DAO lookups (actions → tasks → configs) for the same workflow.
  */
-@Named( "appointment-virtualmeeting.entryIdsCacheService" )
 public class VirtualMeetingEntryIdsCacheService extends AbstractCacheableService
 {
     private static final String CACHE_NAME = "appointment-virtualmeeting.entryIdsCache";

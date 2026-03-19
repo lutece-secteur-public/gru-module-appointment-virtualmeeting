@@ -6,11 +6,12 @@
         <div><a href="${host_url}" target="_blank">${host_url}</a></div>
     </div>
 </#if>
+-->
 <!-- Linkify plain-text URLs in the form response list above using stable data-id-entry selectors -->
 <script>
 (function(){
-    var guestIds = [<#list guest_entry_ids as id>${id}<#sep>,</#list>];
-    var hostIds = [<#list host_entry_ids as id>${id}<#sep>,</#list>];
+    var guestIds = [<#list guest_entry_ids as id>${id?c}<#sep>,</#list>];
+    var hostIds = [<#list host_entry_ids as id>${id?c}<#sep>,</#list>];
     var allIds = guestIds.concat(hostIds);
     if(!allIds.length) return;
     allIds.forEach(function(id){

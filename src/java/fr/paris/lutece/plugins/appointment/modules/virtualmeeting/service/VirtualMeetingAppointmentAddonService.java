@@ -40,9 +40,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-
 import fr.paris.lutece.plugins.appointment.business.form.Form;
 import fr.paris.lutece.plugins.appointment.business.form.FormHome;
 import fr.paris.lutece.plugins.appointment.modules.virtualmeeting.business.AddVirtualMeetingTaskConfig;
@@ -58,6 +55,7 @@ import fr.paris.lutece.plugins.workflowcore.service.action.IActionService;
 import fr.paris.lutece.plugins.workflowcore.service.config.ITaskConfigService;
 import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
 import fr.paris.lutece.plugins.workflowcore.service.task.ITaskService;
+import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
 import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.util.html.HtmlTemplate;
@@ -65,7 +63,6 @@ import fr.paris.lutece.util.html.HtmlTemplate;
 /**
  * Appointment addon service that renders virtual meeting links (guest/host) as clickable URLs in the back-office appointment detail view.
  */
-@Named( "appointment-virtualmeeting.appointmentAddonService" )
 public class VirtualMeetingAppointmentAddonService implements IAppointmentAddonService
 {
     // Template
@@ -81,22 +78,52 @@ public class VirtualMeetingAppointmentAddonService implements IAppointmentAddonS
     private static final String BEAN_ACTION_SERVICE = "workflow.actionService";
     private static final String BEAN_TASK_SERVICE = "workflow.taskService";
     private static final String BEAN_CONFIG_SERVICE = "appointment-virtualmeeting.addVirtualMeetingTaskService";
+    private static final String BEAN_CACHE_SERVICE = "appointment-virtualmeeting.entryIdsCacheService";
 
-    @Inject
-    @Named( BEAN_ACTION_SERVICE )
     private IActionService _actionService;
-
-    @Inject
-    @Named( BEAN_TASK_SERVICE )
     private ITaskService _taskService;
-
-    @Inject
-    @Named( BEAN_CONFIG_SERVICE )
     private ITaskConfigService _taskConfigService;
-
-    @Inject
-    @Named( "appointment-virtualmeeting.entryIdsCacheService" )
     private VirtualMeetingEntryIdsCacheService _cacheService;
+
+    private IActionService getActionService( )
+    {
+        if ( _actionService == null )
+        {
+            _actionService = SpringContextService.getBean( BEAN_ACTION_SERVICE );
+        }
+
+        return _actionService;
+    }
+
+    private ITaskService getTaskService( )
+    {
+        if ( _taskService == null )
+        {
+            _taskService = SpringContextService.getBean( BEAN_TASK_SERVICE );
+        }
+
+        return _taskService;
+    }
+
+    private ITaskConfigService getTaskConfigService( )
+    {
+        if ( _taskConfigService == null )
+        {
+            _taskConfigService = SpringContextService.getBean( BEAN_CONFIG_SERVICE );
+        }
+
+        return _taskConfigService;
+    }
+
+    private VirtualMeetingEntryIdsCacheService getCacheService( )
+    {
+        if ( _cacheService == null )
+        {
+            _cacheService = SpringContextService.getBean( BEAN_CACHE_SERVICE );
+        }
+
+        return _cacheService;
+    }
 
     @Override
     public String getAppointmentAddOn( int nIdAppointment, Locale locale )
@@ -193,9 +220,9 @@ public class VirtualMeetingAppointmentAddonService implements IAppointmentAddonS
     private VirtualMeetingEntryIds resolveEntryIds( int nIdWorkflow, Locale locale )
     {
         // Check cache first
-        if ( _cacheService.isCacheEnable( ) )
+        if ( getCacheService( ).isCacheEnable( ) )
         {
-            VirtualMeetingEntryIds cached = _cacheService.getEntryIds( nIdWorkflow );
+            VirtualMeetingEntryIds cached = getCacheService( ).getEntryIds( nIdWorkflow );
 
             if ( cached != null )
             {
@@ -209,15 +236,15 @@ public class VirtualMeetingAppointmentAddonService implements IAppointmentAddonS
 
         ActionFilter filter = new ActionFilter( );
         filter.setIdWorkflow( nIdWorkflow );
-        List<Action> listActions = _actionService.getListActionByFilter( filter );
+        List<Action> listActions = getActionService( ).getListActionByFilter( filter );
 
         for ( Action action : listActions )
         {
-            List<ITask> listTasks = _taskService.getListTaskByIdAction( action.getId( ), locale );
+            List<ITask> listTasks = getTaskService( ).getListTaskByIdAction( action.getId( ), locale );
 
             for ( ITask task : listTasks )
             {
-                AddVirtualMeetingTaskConfig config = _taskConfigService.findByPrimaryKey( task.getId( ) );
+                AddVirtualMeetingTaskConfig config = getTaskConfigService( ).findByPrimaryKey( task.getId( ) );
 
                 if ( config != null )
                 {
@@ -237,9 +264,9 @@ public class VirtualMeetingAppointmentAddonService implements IAppointmentAddonS
         VirtualMeetingEntryIds entryIds = new VirtualMeetingEntryIds( setGuestEntryIds, setHostEntryIds );
 
         // Store in cache
-        if ( _cacheService.isCacheEnable( ) )
+        if ( getCacheService( ).isCacheEnable( ) )
         {
-            _cacheService.putEntryIds( nIdWorkflow, entryIds );
+            getCacheService( ).putEntryIds( nIdWorkflow, entryIds );
         }
 
         return entryIds;
