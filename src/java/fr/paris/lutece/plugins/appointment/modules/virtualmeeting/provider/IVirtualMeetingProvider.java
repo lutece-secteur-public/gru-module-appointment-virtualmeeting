@@ -33,7 +33,9 @@
  */
 package fr.paris.lutece.plugins.appointment.modules.virtualmeeting.provider;
 
-import java.util.Date;
+import java.util.Map;
+
+import fr.paris.lutece.plugins.appointment.modules.virtualmeeting.exception.VirtualMeetingException;
 
 /**
  * Technology-agnostic interface for virtual meeting operations. Implement this interface to integrate a specific video-conferencing backend (LiveKit, Jitsi,
@@ -43,9 +45,35 @@ import java.util.Date;
  * Follows the same provider pattern as {@code IFileStoreServiceProvider} in lutece-core: each implementation declares a unique {@link #getName() name} and an
  * optional {@link #isDefault() default} flag used for automatic selection.
  * </p>
+ *
+ * <p>
+ * All provider operations receive their parameters via a {@code Map<String, Object>}. Standard parameter keys are defined as constants on this interface.
+ * Providers read only the keys they support and ignore the rest. This allows new provider-specific parameters to be added without changing the interface
+ * signature.
+ * </p>
  */
 public interface IVirtualMeetingProvider
 {
+    // Standard parameter keys
+
+    /** Room name (String, required for all operations). */
+    String PARAM_ROOM_NAME = "roomName";
+
+    /** Seconds to keep the room alive after the last participant leaves (Integer, optional — 0 or absent = server default). Used by {@link #createRoom}. */
+    String PARAM_EMPTY_TIMEOUT = "emptyTimeout";
+
+    /** Maximum number of participants (Integer, optional — 0 or absent = unlimited). Used by {@link #createRoom}. */
+    String PARAM_MAX_PARTICIPANTS = "maxParticipants";
+
+    /** Participant unique identity, e.g. email or access code (String, required for token/URL generation). */
+    String PARAM_IDENTITY = "identity";
+
+    /** Participant display name (String, required for token/URL generation). */
+    String PARAM_DISPLAY_NAME = "displayName";
+
+    /** Earliest date/time the token becomes valid ({@link java.util.Date}, optional — {@code null} or absent = immediate validity). */
+    String PARAM_NOT_BEFORE = "notBefore";
+
     /**
      * Get the unique name of this provider (e.g. "livekit", "jitsi").
      *
@@ -63,54 +91,62 @@ public interface IVirtualMeetingProvider
     /**
      * Create a new meeting room.
      *
-     * @param strRoomName
-     *            the room name
-     * @param nEmptyTimeoutSeconds
-     *            seconds to keep the room alive after the last participant leaves (0 = server default)
-     * @param nMaxParticipants
-     *            maximum number of participants (0 = unlimited)
+     * <p>
+     * Required keys: {@link #PARAM_ROOM_NAME}. Optional keys: {@link #PARAM_EMPTY_TIMEOUT}, {@link #PARAM_MAX_PARTICIPANTS}.
+     * </p>
+     *
+     * @param mapParameters
+     *            the operation parameters
      * @return {@code true} if the room was created successfully
+     * @throws VirtualMeetingException
+     *             if the provider fails to create the room
      */
-    boolean createRoom( String strRoomName, int nEmptyTimeoutSeconds, int nMaxParticipants );
+    boolean createRoom( Map<String, Object> mapParameters ) throws VirtualMeetingException;
 
     /**
      * Delete an existing room.
      *
-     * @param strRoomName
-     *            the room name
+     * <p>
+     * Required keys: {@link #PARAM_ROOM_NAME}.
+     * </p>
+     *
+     * @param mapParameters
+     *            the operation parameters
      * @return {@code true} if the room was deleted successfully
+     * @throws VirtualMeetingException
+     *             if the provider fails to delete the room
      */
-    boolean deleteRoom( String strRoomName );
+    boolean deleteRoom( Map<String, Object> mapParameters ) throws VirtualMeetingException;
 
     /**
      * Generate a participant token with full publish and subscribe permissions.
      *
-     * @param strRoomName
-     *            the room name
-     * @param strIdentity
-     *            the participant unique identity
-     * @param strName
-     *            the participant display name
-     * @param notBefore
-     *            the earliest date/time the token becomes valid ({@code null} for immediate validity)
-     * @return the authentication token string
+     * <p>
+     * Required keys: {@link #PARAM_ROOM_NAME}, {@link #PARAM_IDENTITY}, {@link #PARAM_DISPLAY_NAME}. Optional keys: {@link #PARAM_NOT_BEFORE}.
+     * </p>
+     *
+     * @param mapParameters
+     *            the operation parameters
+     * @return the authentication token string or URL
+     * @throws VirtualMeetingException
+     *             if the provider fails to generate the token
      */
-    String generateParticipantToken( String strRoomName, String strIdentity, String strName, Date notBefore );
+    String generateParticipantToken( Map<String, Object> mapParameters ) throws VirtualMeetingException;
 
     /**
      * Generate a viewer token with subscribe-only permissions (no publish).
      *
-     * @param strRoomName
-     *            the room name
-     * @param strIdentity
-     *            the viewer unique identity
-     * @param strName
-     *            the viewer display name
-     * @param notBefore
-     *            the earliest date/time the token becomes valid ({@code null} for immediate validity)
-     * @return the authentication token string
+     * <p>
+     * Required keys: {@link #PARAM_ROOM_NAME}, {@link #PARAM_IDENTITY}, {@link #PARAM_DISPLAY_NAME}. Optional keys: {@link #PARAM_NOT_BEFORE}.
+     * </p>
+     *
+     * @param mapParameters
+     *            the operation parameters
+     * @return the authentication token string or URL
+     * @throws VirtualMeetingException
+     *             if the provider fails to generate the token
      */
-    String generateViewerToken( String strRoomName, String strIdentity, String strName, Date notBefore );
+    String generateViewerToken( Map<String, Object> mapParameters ) throws VirtualMeetingException;
 
     /**
      * Get the full meeting join URL for a participant.
@@ -119,19 +155,19 @@ public interface IVirtualMeetingProvider
      * URL from {@link #generateParticipantToken} can rely on the default implementation.
      * </p>
      *
-     * @param strRoomName
-     *            the room name
-     * @param strIdentity
-     *            the participant unique identity
-     * @param strName
-     *            the participant display name
-     * @param notBefore
-     *            the earliest date/time the token becomes valid ({@code null} for immediate validity)
+     * <p>
+     * Required keys: {@link #PARAM_ROOM_NAME}, {@link #PARAM_IDENTITY}, {@link #PARAM_DISPLAY_NAME}. Optional keys: {@link #PARAM_NOT_BEFORE}.
+     * </p>
+     *
+     * @param mapParameters
+     *            the operation parameters
      * @return the full meeting URL ready for the participant to join
+     * @throws VirtualMeetingException
+     *             if the provider fails to generate the URL or token
      */
-    default String getParticipantMeetingUrl( String strRoomName, String strIdentity, String strName, Date notBefore )
+    default String getParticipantMeetingUrl( Map<String, Object> mapParameters ) throws VirtualMeetingException
     {
-        return generateParticipantToken( strRoomName, strIdentity, strName, notBefore );
+        return generateParticipantToken( mapParameters );
     }
 
     /**
@@ -141,18 +177,18 @@ public interface IVirtualMeetingProvider
      * URL from {@link #generateViewerToken} can rely on the default implementation.
      * </p>
      *
-     * @param strRoomName
-     *            the room name
-     * @param strIdentity
-     *            the viewer unique identity
-     * @param strName
-     *            the viewer display name
-     * @param notBefore
-     *            the earliest date/time the token becomes valid ({@code null} for immediate validity)
+     * <p>
+     * Required keys: {@link #PARAM_ROOM_NAME}, {@link #PARAM_IDENTITY}, {@link #PARAM_DISPLAY_NAME}. Optional keys: {@link #PARAM_NOT_BEFORE}.
+     * </p>
+     *
+     * @param mapParameters
+     *            the operation parameters
      * @return the full meeting URL ready for the viewer to join
+     * @throws VirtualMeetingException
+     *             if the provider fails to generate the URL or token
      */
-    default String getViewerMeetingUrl( String strRoomName, String strIdentity, String strName, Date notBefore )
+    default String getViewerMeetingUrl( Map<String, Object> mapParameters ) throws VirtualMeetingException
     {
-        return generateViewerToken( strRoomName, strIdentity, strName, notBefore );
+        return generateViewerToken( mapParameters );
     }
 }

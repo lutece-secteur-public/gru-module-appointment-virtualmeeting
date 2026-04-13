@@ -39,8 +39,10 @@ import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 
 import fr.paris.lutece.api.user.User;
+import fr.paris.lutece.plugins.appointment.modules.virtualmeeting.exception.VirtualMeetingException;
 import fr.paris.lutece.plugins.workflowcore.service.task.SimpleTask;
 import fr.paris.lutece.portal.service.i18n.I18nService;
+import fr.paris.lutece.portal.service.util.AppLogService;
 
 /**
  * Workflow task that deletes the virtual meeting room associated with an appointment. The provider information is read from the stored {@code VirtualMeeting}
@@ -72,6 +74,15 @@ public class DeleteVirtualMeetingTask extends SimpleTask
     public boolean processTaskWithResult( int nIdResource, String strResourceType, int nIdResourceHistory, HttpServletRequest request, Locale locale,
             User user )
     {
-        return _virtualMeetingService.deleteMeeting( String.valueOf( nIdResource ), strResourceType );
+        try
+        {
+            return _virtualMeetingService.deleteMeeting( String.valueOf( nIdResource ), strResourceType );
+        }
+        catch( VirtualMeetingException e )
+        {
+            AppLogService.error( "DeleteVirtualMeetingTask — provider '{}' failed to delete meeting for resource {}/{}: {}", e.getProviderName( ),
+                    nIdResource, strResourceType, e.getMessage( ), e );
+            return false;
+        }
     }
 }

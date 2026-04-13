@@ -35,10 +35,13 @@ package fr.paris.lutece.plugins.appointment.modules.virtualmeeting.service;
 
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import fr.paris.lutece.plugins.appointment.modules.virtualmeeting.business.VirtualMeeting;
 import fr.paris.lutece.plugins.appointment.modules.virtualmeeting.business.VirtualMeetingHome;
+import fr.paris.lutece.plugins.appointment.modules.virtualmeeting.exception.VirtualMeetingException;
 import fr.paris.lutece.plugins.appointment.modules.virtualmeeting.provider.IVirtualMeetingProvider;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.util.AppLogService;
@@ -64,27 +67,27 @@ public class VirtualMeetingService
      *            the resource type
      * @param strProviderName
      *            the provider name (see {@link IVirtualMeetingProvider#getName()}); if {@code null} or empty, the default provider is used
-     * @return the created {@link VirtualMeeting}, or {@code null} on failure
+     * @return the created {@link VirtualMeeting}
+     * @throws VirtualMeetingException
+     *             if the provider cannot be resolved or the room creation fails
      */
-    public VirtualMeeting createMeeting( String strIdResource, String strResourceType, String strProviderName )
+    public VirtualMeeting createMeeting( String strIdResource, String strResourceType, String strProviderName ) throws VirtualMeetingException
     {
         IVirtualMeetingProvider provider = getProvider( strProviderName );
-
-        if ( provider == null )
-        {
-            AppLogService.error( "VirtualMeeting — no provider found for name: {}", strProviderName );
-            return null;
-        }
 
         String strRoomName = ROOM_NAME_PREFIX + strResourceType + "-" + strIdResource;
         int nEmptyTimeout = AppPropertiesService.getPropertyInt( PROPERTY_EMPTY_TIMEOUT, DEFAULT_EMPTY_TIMEOUT );
 
-        boolean bCreated = provider.createRoom( strRoomName, nEmptyTimeout, 0 );
+        Map<String, Object> mapParameters = new HashMap<>( );
+        mapParameters.put( IVirtualMeetingProvider.PARAM_ROOM_NAME, strRoomName );
+        mapParameters.put( IVirtualMeetingProvider.PARAM_EMPTY_TIMEOUT, nEmptyTimeout );
+        mapParameters.put( IVirtualMeetingProvider.PARAM_MAX_PARTICIPANTS, 0 );
+
+        boolean bCreated = provider.createRoom( mapParameters );
 
         if ( !bCreated )
         {
-            AppLogService.error( "VirtualMeeting — failed to create room {} via provider '{}'", strRoomName, provider.getName( ) );
-            return null;
+            throw new VirtualMeetingException( "Failed to create room " + strRoomName, provider.getName( ) );
         }
 
         VirtualMeeting meeting = new VirtualMeeting( );
@@ -104,9 +107,11 @@ public class VirtualMeetingService
      *            the resource ID
      * @param strResourceType
      *            the resource type
-     * @return {@code true} if the room was deleted successfully
+     * @return {@code true} if the room was deleted successfully, {@code false} if no meeting was found for the given resource
+     * @throws VirtualMeetingException
+     *             if the provider cannot be resolved or the room deletion fails
      */
-    public boolean deleteMeeting( String strIdResource, String strResourceType )
+    public boolean deleteMeeting( String strIdResource, String strResourceType ) throws VirtualMeetingException
     {
         VirtualMeeting meeting = VirtualMeetingHome.findByResourceId( strIdResource, strResourceType );
 
@@ -118,14 +123,9 @@ public class VirtualMeetingService
 
         IVirtualMeetingProvider provider = getProvider( meeting.getProvider( ) );
 
-        if ( provider != null )
-        {
-            provider.deleteRoom( meeting.getRoomName( ) );
-        }
-        else
-        {
-            AppLogService.error( "VirtualMeeting — no provider found for name: '{}'. Removing DB record only.", meeting.getProvider( ) );
-        }
+        Map<String, Object> mapParameters = new HashMap<>( );
+        mapParameters.put( IVirtualMeetingProvider.PARAM_ROOM_NAME, meeting.getRoomName( ) );
+        provider.deleteRoom( mapParameters );
 
         VirtualMeetingHome.removeByResourceId( strIdResource, strResourceType );
         return true;
@@ -157,17 +157,20 @@ public class VirtualMeetingService
      * @param notBefore
      *            the earliest date/time the token becomes valid ({@code null} for immediate validity)
      * @return the meeting URL with a fresh token
+     * @throws VirtualMeetingException
+     *             if the provider cannot be resolved or URL generation fails
      */
-    public String getHostMeetingUrl( VirtualMeeting meeting, String strIdentity, String strDisplayName, Date notBefore )
+    public String getHostMeetingUrl( VirtualMeeting meeting, String strIdentity, String strDisplayName, Date notBefore ) throws VirtualMeetingException
     {
         IVirtualMeetingProvider provider = getProvider( meeting.getProvider( ) );
 
-        if ( provider == null )
-        {
-            return null;
-        }
+        Map<String, Object> mapParameters = new HashMap<>( );
+        mapParameters.put( IVirtualMeetingProvider.PARAM_ROOM_NAME, meeting.getRoomName( ) );
+        mapParameters.put( IVirtualMeetingProvider.PARAM_IDENTITY, strIdentity );
+        mapParameters.put( IVirtualMeetingProvider.PARAM_DISPLAY_NAME, strDisplayName );
+        mapParameters.put( IVirtualMeetingProvider.PARAM_NOT_BEFORE, notBefore );
 
-        return provider.getParticipantMeetingUrl( meeting.getRoomName( ), strIdentity, strDisplayName, notBefore );
+        return provider.getParticipantMeetingUrl( mapParameters );
     }
 
     /**
@@ -182,17 +185,20 @@ public class VirtualMeetingService
      * @param notBefore
      *            the earliest date/time the token becomes valid ({@code null} for immediate validity)
      * @return the meeting URL with a fresh token
+     * @throws VirtualMeetingException
+     *             if the provider cannot be resolved or URL generation fails
      */
-    public String getGuestMeetingUrl( VirtualMeeting meeting, String strIdentity, String strDisplayName, Date notBefore )
+    public String getGuestMeetingUrl( VirtualMeeting meeting, String strIdentity, String strDisplayName, Date notBefore ) throws VirtualMeetingException
     {
         IVirtualMeetingProvider provider = getProvider( meeting.getProvider( ) );
 
-        if ( provider == null )
-        {
-            return null;
-        }
+        Map<String, Object> mapParameters = new HashMap<>( );
+        mapParameters.put( IVirtualMeetingProvider.PARAM_ROOM_NAME, meeting.getRoomName( ) );
+        mapParameters.put( IVirtualMeetingProvider.PARAM_IDENTITY, strIdentity );
+        mapParameters.put( IVirtualMeetingProvider.PARAM_DISPLAY_NAME, strDisplayName );
+        mapParameters.put( IVirtualMeetingProvider.PARAM_NOT_BEFORE, notBefore );
 
-        return provider.getParticipantMeetingUrl( meeting.getRoomName( ), strIdentity, strDisplayName, notBefore );
+        return provider.getParticipantMeetingUrl( mapParameters );
     }
 
     /**
@@ -205,18 +211,22 @@ public class VirtualMeetingService
      *
      * @param strProviderName
      *            the provider name, or {@code null} for the default
-     * @return the matching provider, or {@code null} if none found
+     * @return the matching provider (never {@code null})
+     * @throws VirtualMeetingException
+     *             if no matching or default provider is found
      */
-    public IVirtualMeetingProvider getProvider( String strProviderName )
+    public IVirtualMeetingProvider getProvider( String strProviderName ) throws VirtualMeetingException
     {
         List<IVirtualMeetingProvider> providers = SpringContextService.getBeansOfType( IVirtualMeetingProvider.class );
 
         if ( strProviderName != null && !strProviderName.isEmpty( ) )
         {
-            return providers.stream( ).filter( p -> strProviderName.equals( p.getName( ) ) ).findFirst( ).orElse( null );
+            return providers.stream( ).filter( p -> strProviderName.equals( p.getName( ) ) ).findFirst( )
+                    .orElseThrow( ( ) -> new VirtualMeetingException( "No provider found for name: " + strProviderName ) );
         }
 
         // Fallback: return the default provider
-        return providers.stream( ).filter( IVirtualMeetingProvider::isDefault ).findFirst( ).orElse( null );
+        return providers.stream( ).filter( IVirtualMeetingProvider::isDefault ).findFirst( )
+                .orElseThrow( ( ) -> new VirtualMeetingException( "No default virtual meeting provider configured" ) );
     }
 }

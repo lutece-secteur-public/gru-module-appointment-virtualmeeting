@@ -44,6 +44,7 @@ import fr.paris.lutece.plugins.appointment.modules.virtualmeeting.business.AddVi
 import fr.paris.lutece.plugins.appointment.modules.virtualmeeting.business.VirtualMeeting;
 import fr.paris.lutece.plugins.appointment.modules.virtualmeeting.business.VirtualMeetingTaskInformation;
 import fr.paris.lutece.plugins.appointment.modules.virtualmeeting.business.VirtualMeetingTaskInformationHome;
+import fr.paris.lutece.plugins.appointment.modules.virtualmeeting.exception.VirtualMeetingException;
 import fr.paris.lutece.plugins.appointment.service.AppointmentResponseService;
 import fr.paris.lutece.plugins.appointment.service.AppointmentService;
 import fr.paris.lutece.plugins.appointment.web.dto.AppointmentDTO;
@@ -103,26 +104,25 @@ public class AddVirtualMeetingTask extends SimpleTask
             return false;
         }
 
-        String strIdResource = String.valueOf( nIdResource );
-        VirtualMeeting meeting = _virtualMeetingService.createMeeting( strIdResource, strResourceType, config.getProvider( ) );
-
-        if ( meeting == null )
+        try
         {
+            String strIdResource = String.valueOf( nIdResource );
+            VirtualMeeting meeting = _virtualMeetingService.createMeeting( strIdResource, strResourceType, config.getProvider( ) );
+
+            // Store the host URL in the task information table for workflow history display
+            String strHostUrl = _virtualMeetingService.getHostMeetingUrl( meeting, "host-" + nIdResource, "Host", null );
+            VirtualMeetingTaskInformationHome.create( new VirtualMeetingTaskInformation( nIdResourceHistory, getId( ), strHostUrl ) );
+
+            writeUrlsToResponses( nIdResource, config, meeting );
+
+            return true;
+        }
+        catch( VirtualMeetingException e )
+        {
+            AppLogService.error( "AddVirtualMeetingTask — provider '{}' failed for task {}: {}", e.getProviderName( ), getId( ), e.getMessage( ), e );
             saveErrorInformation( nIdResourceHistory, MESSAGE_ERROR_ROOM_CREATION_FAILED, locale );
             return false;
         }
-
-        // Store the host URL in the task information table for workflow history display
-        String strHostUrl = _virtualMeetingService.getHostMeetingUrl( meeting, "host-" + nIdResource, "Host", null );
-
-        if ( strHostUrl != null )
-        {
-            VirtualMeetingTaskInformationHome.create( new VirtualMeetingTaskInformation( nIdResourceHistory, getId( ), strHostUrl ) );
-        }
-
-        writeUrlsToResponses( nIdResource, config, meeting );
-
-        return true;
     }
 
     /**
@@ -170,6 +170,11 @@ public class AddVirtualMeetingTask extends SimpleTask
                     writeUrlToResponse( nIdAppointment, nIdEntryHostLink, strHostUrl );
                 }
             }
+        }
+        catch( VirtualMeetingException e )
+        {
+            AppLogService.error( "AddVirtualMeetingTask — provider '{}' failed to generate meeting URLs for appointment {}", e.getProviderName( ),
+                    nIdAppointment, e );
         }
         catch( Exception e )
         {
