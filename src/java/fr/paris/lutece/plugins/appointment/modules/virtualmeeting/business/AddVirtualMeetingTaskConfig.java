@@ -42,6 +42,7 @@ public class AddVirtualMeetingTaskConfig extends TaskConfig
 {
     // Variables declaration
     private String _strProvider;
+    private String _strAccessLevel;
     private int _nIdEntryGuestLink;
     private int _nIdEntryHostLink;
 
@@ -64,6 +65,27 @@ public class AddVirtualMeetingTaskConfig extends TaskConfig
     public void setProvider( String strProvider )
     {
         _strProvider = strProvider;
+    }
+
+    /**
+     * Returns the AccessLevel
+     *
+     * @return The AccessLevel, or {@code null}/empty when the provider default should apply
+     */
+    public String getAccessLevel( )
+    {
+        return _strAccessLevel;
+    }
+
+    /**
+     * Sets the AccessLevel
+     *
+     * @param strAccessLevel
+     *            The AccessLevel
+     */
+    public void setAccessLevel( String strAccessLevel )
+    {
+        _strAccessLevel = strAccessLevel;
     }
 
     /**

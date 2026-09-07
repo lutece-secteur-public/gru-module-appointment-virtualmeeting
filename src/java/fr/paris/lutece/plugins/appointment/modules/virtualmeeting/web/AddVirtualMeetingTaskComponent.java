@@ -34,11 +34,15 @@
 package fr.paris.lutece.plugins.appointment.modules.virtualmeeting.web;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.lang3.StringUtils;
 
 import fr.paris.lutece.plugins.appointment.business.form.Form;
 import fr.paris.lutece.plugins.appointment.business.form.FormHome;
@@ -54,6 +58,7 @@ import fr.paris.lutece.plugins.workflowcore.business.action.Action;
 import fr.paris.lutece.plugins.workflowcore.business.config.ITaskConfig;
 import fr.paris.lutece.plugins.workflowcore.service.action.IActionService;
 import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
+import fr.paris.lutece.portal.service.i18n.I18nService;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
 import fr.paris.lutece.portal.service.util.AppLogService;
@@ -72,12 +77,17 @@ public class AddVirtualMeetingTaskComponent extends AbstractTaskComponent
     // Markers
     private static final String MARK_CONFIG = "config";
     private static final String MARK_PROVIDER_LIST = "provider_list";
+    private static final String MARK_ACCESS_LEVEL_MAP = "access_level_map";
+    private static final String MARK_ACCESS_LEVEL_DEFAULT = "access_level_default";
     private static final String MARK_ENTRY_LIST = "entry_list";
     private static final String MARK_HOST_URL = "host_url";
     private static final String MARK_ERROR_MESSAGE = "error_message";
 
     // Beans
     private static final String BEAN_ACTION_SERVICE = "workflow.actionService";
+
+    // I18n
+    private static final String PROPERTY_ACCESS_LEVEL_PREFIX = "module.appointment.virtualmeeting.task.config.accessLevel.";
 
     // Constants
     private static final String RESOURCE_TYPE_APPOINTMENT = "APPOINTMENT_FORM";
@@ -97,6 +107,8 @@ public class AddVirtualMeetingTaskComponent extends AbstractTaskComponent
         Map<String, Object> model = new HashMap<>( );
         model.put( MARK_CONFIG, config );
         model.put( MARK_PROVIDER_LIST, getAvailableProviders( ) );
+        model.put( MARK_ACCESS_LEVEL_MAP, getAccessLevelsByProvider( locale ) );
+        model.put( MARK_ACCESS_LEVEL_DEFAULT, getDefaultAccessLevelSummary( ) );
         model.put( MARK_ENTRY_LIST, getFormEntries( task ) );
 
         HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_TASK_CONFIG, locale, model );
@@ -153,6 +165,76 @@ public class AddVirtualMeetingTaskComponent extends AbstractTaskComponent
         }
 
         return list;
+    }
+
+    /**
+     * Build, for each registered provider that supports access levels, the ReferenceList of levels it accepts. Providers returning an empty list are omitted so
+     * that the template renders no group for them.
+     *
+     * @param locale
+     *            the locale used to resolve the level labels
+     * @return a map keyed by provider name, in provider discovery order
+     */
+    private Map<String, ReferenceList> getAccessLevelsByProvider( Locale locale )
+    {
+        Map<String, ReferenceList> mapLevels = new LinkedHashMap<>( );
+
+        for ( IVirtualMeetingProvider provider : SpringContextService.getBeansOfType( IVirtualMeetingProvider.class ) )
+        {
+            ReferenceList levels = new ReferenceList( );
+
+            for ( String strLevel : provider.getSupportedAccessLevels( ) )
+            {
+                levels.addItem( strLevel, getAccessLevelLabel( strLevel, locale ) );
+            }
+
+            if ( !levels.isEmpty( ) )
+            {
+                mapLevels.put( provider.getName( ), levels );
+            }
+        }
+
+        return mapLevels;
+    }
+
+    /**
+     * Summarize what "provider default" resolves to, for display next to the blank option. With a single provider the bare code is returned (e.g.
+     * {@code trusted}); with several, each one is listed as {@code name : code}. Providers that cannot tell their default are skipped.
+     *
+     * @return the summary, or an empty string when no provider reports a default
+     */
+    private String getDefaultAccessLevelSummary( )
+    {
+        Map<String, String> mapDefaults = new LinkedHashMap<>( );
+
+        for ( IVirtualMeetingProvider provider : SpringContextService.getBeansOfType( IVirtualMeetingProvider.class ) )
+        {
+            String strDefault = provider.getDefaultAccessLevel( );
+
+            if ( StringUtils.isNotEmpty( strDefault ) )
+            {
+                mapDefaults.put( provider.getName( ), strDefault );
+            }
+        }
+
+        if ( mapDefaults.size( ) == 1 )
+        {
+            return mapDefaults.values( ).iterator( ).next( );
+        }
+
+        return mapDefaults.entrySet( ).stream( ).map( e -> e.getKey( ) + " : " + e.getValue( ) ).collect( Collectors.joining( ", " ) );
+    }
+
+    /**
+     * Resolve the localized label of an access level, falling back to the raw code when no message is defined — third-party providers may expose levels this
+     * module does not know about.
+     */
+    private String getAccessLevelLabel( String strLevel, Locale locale )
+    {
+        String strKey = PROPERTY_ACCESS_LEVEL_PREFIX + strLevel;
+        String strLabel = I18nService.getLocalizedString( strKey, locale );
+
+        return StringUtils.isEmpty( strLabel ) || strKey.equals( strLabel ) ? strLevel : strLabel;
     }
 
     /**

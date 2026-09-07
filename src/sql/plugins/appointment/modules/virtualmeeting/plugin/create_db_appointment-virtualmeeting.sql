@@ -4,6 +4,7 @@
 CREATE TABLE IF NOT EXISTS workflow_task_addvirtualmeeting_config (
     id_task INT NOT NULL,
     provider VARCHAR(255) NOT NULL DEFAULT '',
+    access_level VARCHAR(50) NOT NULL DEFAULT '',
     id_entry_guest_link INT NOT NULL DEFAULT 0,
     id_entry_host_link INT NOT NULL DEFAULT 0,
     PRIMARY KEY (id_task)

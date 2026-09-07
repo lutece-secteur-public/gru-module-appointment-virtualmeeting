@@ -34,6 +34,8 @@
 
 package fr.paris.lutece.plugins.appointment.modules.virtualmeeting.business;
 
+import org.apache.commons.lang3.StringUtils;
+
 import fr.paris.lutece.plugins.workflowcore.business.config.ITaskConfigDAO;
 
 import fr.paris.lutece.util.sql.DAOUtil;
@@ -45,11 +47,11 @@ import java.sql.Statement;
 public class AddVirtualMeetingTaskConfigDAO implements ITaskConfigDAO<AddVirtualMeetingTaskConfig>
 {
     // Constants
-    private static final String SQL_QUERY_INSERT = "INSERT INTO workflow_task_addvirtualmeeting_config ( id_task, provider, id_entry_guest_link, id_entry_host_link ) VALUES ( ?, ?, ?, ? )";
+    private static final String SQL_QUERY_INSERT = "INSERT INTO workflow_task_addvirtualmeeting_config ( id_task, provider, access_level, id_entry_guest_link, id_entry_host_link ) VALUES ( ?, ?, ?, ?, ? )";
     private static final String SQL_QUERY_DELETE = "DELETE FROM workflow_task_addvirtualmeeting_config WHERE id_task = ? ";
-    private static final String SQL_QUERY_UPDATE = "UPDATE workflow_task_addvirtualmeeting_config SET provider = ?, id_entry_guest_link = ?, id_entry_host_link = ? WHERE id_task = ?";
+    private static final String SQL_QUERY_UPDATE = "UPDATE workflow_task_addvirtualmeeting_config SET provider = ?, access_level = ?, id_entry_guest_link = ?, id_entry_host_link = ? WHERE id_task = ?";
 
-    private static final String SQL_QUERY_SELECTALL = "SELECT id_task, provider, id_entry_guest_link, id_entry_host_link FROM workflow_task_addvirtualmeeting_config";
+    private static final String SQL_QUERY_SELECTALL = "SELECT id_task, provider, access_level, id_entry_guest_link, id_entry_host_link FROM workflow_task_addvirtualmeeting_config";
     private static final String SQL_QUERY_SELECT_BY_ID = SQL_QUERY_SELECTALL + " WHERE id_task = ?";
 
     /**
@@ -63,6 +65,7 @@ public class AddVirtualMeetingTaskConfigDAO implements ITaskConfigDAO<AddVirtual
             int nIndex = 1;
             daoUtil.setInt( nIndex++, addVirtualMeetingTaskConfig.getIdTask( ) );
             daoUtil.setString( nIndex++, addVirtualMeetingTaskConfig.getProvider( ) );
+            daoUtil.setString( nIndex++, StringUtils.defaultString( addVirtualMeetingTaskConfig.getAccessLevel( ) ) );
             daoUtil.setInt( nIndex++, addVirtualMeetingTaskConfig.getIdEntryGuestLink( ) );
             daoUtil.setInt( nIndex++, addVirtualMeetingTaskConfig.getIdEntryHostLink( ) );
 
@@ -83,6 +86,7 @@ public class AddVirtualMeetingTaskConfigDAO implements ITaskConfigDAO<AddVirtual
             int nIndex = 1;
 
             daoUtil.setString( nIndex++, addVirtualMeetingTaskConfig.getProvider( ) );
+            daoUtil.setString( nIndex++, StringUtils.defaultString( addVirtualMeetingTaskConfig.getAccessLevel( ) ) );
             daoUtil.setInt( nIndex++, addVirtualMeetingTaskConfig.getIdEntryGuestLink( ) );
             daoUtil.setInt( nIndex++, addVirtualMeetingTaskConfig.getIdEntryHostLink( ) );
             daoUtil.setInt( nIndex, addVirtualMeetingTaskConfig.getIdTask( ) );
@@ -131,6 +135,7 @@ public class AddVirtualMeetingTaskConfigDAO implements ITaskConfigDAO<AddVirtual
 
         addVirtualMeetingTaskConfig.setIdTask( daoUtil.getInt( nIndex++ ) );
         addVirtualMeetingTaskConfig.setProvider( daoUtil.getString( nIndex++ ) );
+        addVirtualMeetingTaskConfig.setAccessLevel( daoUtil.getString( nIndex++ ) );
         addVirtualMeetingTaskConfig.setIdEntryGuestLink( daoUtil.getInt( nIndex++ ) );
         addVirtualMeetingTaskConfig.setIdEntryHostLink( daoUtil.getInt( nIndex ) );
 

@@ -33,6 +33,8 @@
  */
 package fr.paris.lutece.plugins.appointment.modules.virtualmeeting.provider;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import fr.paris.lutece.plugins.appointment.modules.virtualmeeting.exception.VirtualMeetingException;
@@ -75,6 +77,12 @@ public interface IVirtualMeetingProvider
     String PARAM_NOT_BEFORE = "notBefore";
 
     /**
+     * Room access level (String, optional — absent or empty = provider default). One of the values returned by {@link #getSupportedAccessLevels()}. Used by
+     * {@link #createRoom}.
+     */
+    String PARAM_ACCESS_LEVEL = "accessLevel";
+
+    /**
      * Get the unique name of this provider (e.g. "livekit", "jitsi").
      *
      * @return the provider name
@@ -89,10 +97,42 @@ public interface IVirtualMeetingProvider
     boolean isDefault( );
 
     /**
+     * Get the access levels this provider accepts for {@link #PARAM_ACCESS_LEVEL}, in display order.
+     *
+     * <p>
+     * Returned values are the raw codes sent to the backend (e.g. {@code "public"}, {@code "trusted"}, {@code "restricted"}). Providers whose backend has no
+     * such notion return an empty list — the default implementation — and callers then omit the parameter.
+     * </p>
+     *
+     * @return the supported access level codes, never {@code null}
+     */
+    default List<String> getSupportedAccessLevels( )
+    {
+        return Collections.emptyList( );
+    }
+
+    /**
+     * Get the access level this provider will effectively apply when {@link #PARAM_ACCESS_LEVEL} is absent from a {@link #createRoom} call — i.e. its
+     * configured site-wide default, or the backend default when nothing is configured.
+     *
+     * <p>
+     * Purely informative: the back-office uses it to tell administrators what "provider default" resolves to. Providers that cannot know the effective value
+     * return {@code null} — the default implementation.
+     * </p>
+     *
+     * @return one of {@link #getSupportedAccessLevels()}, or {@code null} if unknown
+     */
+    default String getDefaultAccessLevel( )
+    {
+        return null;
+    }
+
+    /**
      * Create a new meeting room.
      *
      * <p>
-     * Required keys: {@link #PARAM_ROOM_NAME}. Optional keys: {@link #PARAM_EMPTY_TIMEOUT}, {@link #PARAM_MAX_PARTICIPANTS}.
+     * Required keys: {@link #PARAM_ROOM_NAME}. Optional keys: {@link #PARAM_EMPTY_TIMEOUT}, {@link #PARAM_MAX_PARTICIPANTS},
+     * {@link #PARAM_ACCESS_LEVEL}.
      * </p>
      *
      * @param mapParameters

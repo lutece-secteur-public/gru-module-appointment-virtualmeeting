@@ -8,6 +8,23 @@
     <small class="form-text text-muted">#i18n{module.appointment.virtualmeeting.task.config.labelProvider.help}</small>
 </div>
 
+<#if access_level_map?has_content>
+<div class="form-group">
+    <label for="accessLevel">#i18n{module.appointment.virtualmeeting.task.config.labelAccessLevel}</label>
+    <select name="accessLevel" id="accessLevel" class="form-control">
+        <option value="">#i18n{module.appointment.virtualmeeting.task.config.accessLevel.default}<#if access_level_default?has_content> (${access_level_default})</#if></option>
+        <#list access_level_map as providerName, levels>
+            <optgroup label="${providerName}">
+                <#list levels as item>
+                    <option value="${item.code}" <#if config.accessLevel?? && config.accessLevel == item.code>selected</#if>>${item.name}</option>
+                </#list>
+            </optgroup>
+        </#list>
+    </select>
+    <small class="form-text text-muted">#i18n{module.appointment.virtualmeeting.task.config.labelAccessLevel.help}</small>
+</div>
+</#if>
+
 <div class="form-group">
     <label for="idEntryGuestLink">#i18n{module.appointment.virtualmeeting.task.config.labelEntryGuestLink}</label>
     <select name="idEntryGuestLink" id="idEntryGuestLink" class="form-control">

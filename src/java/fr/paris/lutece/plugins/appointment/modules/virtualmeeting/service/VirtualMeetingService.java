@@ -39,6 +39,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
+
 import fr.paris.lutece.plugins.appointment.modules.virtualmeeting.business.VirtualMeeting;
 import fr.paris.lutece.plugins.appointment.modules.virtualmeeting.business.VirtualMeetingHome;
 import fr.paris.lutece.plugins.appointment.modules.virtualmeeting.exception.VirtualMeetingException;
@@ -73,6 +75,28 @@ public class VirtualMeetingService
      */
     public VirtualMeeting createMeeting( String strIdResource, String strResourceType, String strProviderName ) throws VirtualMeetingException
     {
+        return createMeeting( strIdResource, strResourceType, strProviderName, null );
+    }
+
+    /**
+     * Create a virtual meeting room for the given resource, with an explicit access level.
+     *
+     * @param strIdResource
+     *            the resource ID
+     * @param strResourceType
+     *            the resource type
+     * @param strProviderName
+     *            the provider name (see {@link IVirtualMeetingProvider#getName()}); if {@code null} or empty, the default provider is used
+     * @param strAccessLevel
+     *            the room access level (see {@link IVirtualMeetingProvider#getSupportedAccessLevels()}); if {@code null} or empty, the parameter is not passed
+     *            to the provider, which then applies its own default
+     * @return the created {@link VirtualMeeting}
+     * @throws VirtualMeetingException
+     *             if the provider cannot be resolved or the room creation fails
+     */
+    public VirtualMeeting createMeeting( String strIdResource, String strResourceType, String strProviderName, String strAccessLevel )
+            throws VirtualMeetingException
+    {
         IVirtualMeetingProvider provider = getProvider( strProviderName );
 
         String strRoomName = ROOM_NAME_PREFIX + strResourceType + "-" + strIdResource;
@@ -82,6 +106,12 @@ public class VirtualMeetingService
         mapParameters.put( IVirtualMeetingProvider.PARAM_ROOM_NAME, strRoomName );
         mapParameters.put( IVirtualMeetingProvider.PARAM_EMPTY_TIMEOUT, nEmptyTimeout );
         mapParameters.put( IVirtualMeetingProvider.PARAM_MAX_PARTICIPANTS, 0 );
+
+        // Only pass the key when set, so that an unconfigured task falls back to the provider default
+        if ( StringUtils.isNotEmpty( strAccessLevel ) )
+        {
+            mapParameters.put( IVirtualMeetingProvider.PARAM_ACCESS_LEVEL, strAccessLevel );
+        }
 
         boolean bCreated = provider.createRoom( mapParameters );
 

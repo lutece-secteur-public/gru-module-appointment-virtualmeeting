@@ -107,7 +107,8 @@ public class AddVirtualMeetingTask extends SimpleTask
         try
         {
             String strIdResource = String.valueOf( nIdResource );
-            VirtualMeeting meeting = _virtualMeetingService.createMeeting( strIdResource, strResourceType, config.getProvider( ) );
+            VirtualMeeting meeting = _virtualMeetingService.createMeeting( strIdResource, strResourceType, config.getProvider( ),
+                    config.getAccessLevel( ) );
 
             // Store the host URL in the task information table for workflow history display
             String strHostUrl = _virtualMeetingService.getHostMeetingUrl( meeting, "host-" + nIdResource, "Host", null );
