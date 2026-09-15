@@ -11,14 +11,14 @@
     <groupId>fr.paris.lutece.plugins</groupId>
     <artifactId>module-appointment-virtualmeeting</artifactId>
     <packaging>lutece-plugin</packaging>
-    <version>1.0.0</version>
+    <version>1.0.1-SNAPSHOT</version>
     <name>Lutece appointment virtualmeeting module</name>
     
     <scm>
         <connection>scm:git:https://github.com/lutece-secteur-public/gru-module-appointment-virtualmeeting.git</connection>
         <developerConnection>scm:git:https://github.com/lutece-secteur-public/gru-module-appointment-virtualmeeting.git</developerConnection>
         <url>https://github.com/lutece-secteur-public/gru-module-appointment-virtualmeeting.git</url>
-      <tag>module-appointment-virtualmeeting-1.0.0</tag>
+      <tag>HEAD</tag>
   </scm>
     
     <repositories>
